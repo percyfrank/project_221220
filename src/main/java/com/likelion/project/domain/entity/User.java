@@ -9,7 +9,9 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Getter
-public class User {
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
