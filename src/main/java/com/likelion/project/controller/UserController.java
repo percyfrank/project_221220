@@ -29,6 +29,7 @@ public class UserController {
     @PostMapping("/login")
     public UserLoginResponse login(@RequestBody UserLoginRequest userLoginRequest) {
         log.info("로그인 성공");
+        log.info("crontab 실행 확인");
         return new UserLoginResponse(userService.login(userLoginRequest.getUserName(),userLoginRequest.getPassword()));
     }
 
