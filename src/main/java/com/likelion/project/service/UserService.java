@@ -1,7 +1,9 @@
 package com.likelion.project.service;
 
+import com.likelion.project.configuration.JwtTokenUtil;
 import com.likelion.project.domain.dto.user.UserDto;
 import com.likelion.project.domain.dto.user.UserJoinRequest;
+import com.likelion.project.domain.dto.user.UserLoginResponse;
 import com.likelion.project.domain.entity.User;
 import com.likelion.project.exception.ErrorCode;
 import com.likelion.project.exception.UserException;
@@ -21,6 +23,8 @@ public class UserService {
     @Value("${jwt.token.secret}")
     private String secretKey;
 
+    private long expireTimeMs = 2000 * 60 * 60;
+
     public UserDto join(UserJoinRequest userJoinRequest) {
 
         // 중복 검사
@@ -37,6 +41,18 @@ public class UserService {
                 .id(savedUser.getId())
                 .userName(savedUser.getUserName())
                 .build();
+    }
 
+    public String login(String userName, String password) {
+        // userName 존재 확인
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UserException(ErrorCode.USERNAME_NOT_FOUND));
+
+        // password 일치 여부 확인
+        if(!encoder.matches(password,user.getPassword())) {
+            throw new UserException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        return JwtTokenUtil.createToken(userName, secretKey, expireTimeMs);
     }
 }
