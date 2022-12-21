@@ -26,6 +26,10 @@ public class GlobalExceptionHandler {
                 .body(Response.error("ERROR",errorResponse));
     }
 
-
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> runtimeExceptionHandler(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Response.error("ERROR",e.getMessage()));
+    }
 
 }
