@@ -12,11 +12,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<ErrorResponse> userExceptionHandle(UserException e) {
-        log.error("UserException",e);
+        log.error("UserException",e.getErrorCode());
         ErrorResponse errorResponse = new ErrorResponse(e.getErrorCode());
         return ResponseEntity.status(e.getErrorCode().getStatus())
                 .body(errorResponse);
     }
+
+    @ExceptionHandler(PostException.class)
+    public ResponseEntity<ErrorResponse> postExceptionHandle(PostException e) {
+        log.error("PostException",e.getErrorCode());
+        ErrorResponse errorResponse = new ErrorResponse(e.getErrorCode());
+        return ResponseEntity.status(e.getErrorCode().getStatus())
+                .body(errorResponse);
+    }
+
 
 
 }
