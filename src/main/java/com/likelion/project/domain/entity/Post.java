@@ -9,6 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Getter
+@Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Post extends BaseEntity{

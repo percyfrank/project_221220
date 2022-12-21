@@ -1,9 +1,6 @@
 package com.likelion.project.service;
 
-import com.likelion.project.domain.dto.post.PostCreateRequest;
-import com.likelion.project.domain.dto.post.PostCreateResponse;
-import com.likelion.project.domain.dto.post.PostDetailResponse;
-import com.likelion.project.domain.dto.post.PostResponse;
+import com.likelion.project.domain.dto.post.*;
 import com.likelion.project.domain.entity.Post;
 import com.likelion.project.domain.entity.User;
 import com.likelion.project.exception.ErrorCode;
@@ -13,13 +10,12 @@ import com.likelion.project.repository.PostRepository;
 import com.likelion.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.validation.Valid;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +29,7 @@ public class PostService {
 
         // Authentication으로 넘어온 userName 확인, 없으면 등록 불가
         User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new PostException(ErrorCode.USERNAME_NOT_FOUND));
+                .orElseThrow(() -> new PostException(ErrorCode.INVALID_PERMISSION));
 
         Post post = Post.builder()
                 .title(request.getTitle())
@@ -59,5 +55,22 @@ public class PostService {
 
     }
 
+    @Transactional
+    public void update(Integer id, String userName, PostUpdateRequest request) {
+        // Authentication으로 넘어온 userName 확인, 없으면 수정 불가
+        userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UserException(ErrorCode.USERNAME_NOT_FOUND));
 
+        // 수정할 포스트 존재 확인
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
+        // 포스트를 수정한 사용자와 포스트를 최초 작성한자의 동일성 검증
+        if (!post.getUser().getUserName().equals(userName)) {
+            throw new PostException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        post.setTitle(request.getTitle());
+        post.setBody(request.getBody());
+    }
 }
