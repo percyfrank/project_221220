@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class ErrorResponse {
 
-    private HttpStatus status;
+    private ErrorCode errorCode;
     private String message;
 
     public ErrorResponse(ErrorCode errorCode) {
-        this.status = errorCode.getStatus();
+        this.errorCode = errorCode;
         this.message = errorCode.getMessage();
     }
 }

@@ -11,19 +11,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserException.class)
-    public ResponseEntity<ErrorResponse> userExceptionHandle(UserException e) {
-        log.error("UserException",e.getErrorCode());
+    public ResponseEntity<Response> userExceptionHandle(UserException e) {
+        log.error("UserException : {}",e.getErrorCode());
         ErrorResponse errorResponse = new ErrorResponse(e.getErrorCode());
         return ResponseEntity.status(e.getErrorCode().getStatus())
-                .body(errorResponse);
+                .body(Response.error("ERROR",errorResponse));
     }
 
     @ExceptionHandler(PostException.class)
-    public ResponseEntity<ErrorResponse> postExceptionHandle(PostException e) {
-        log.error("PostException",e.getErrorCode());
+    public ResponseEntity<Response> postExceptionHandle(PostException e) {
+        log.error("PostException : {}",e.getErrorCode());
         ErrorResponse errorResponse = new ErrorResponse(e.getErrorCode());
         return ResponseEntity.status(e.getErrorCode().getStatus())
-                .body(errorResponse);
+                .body(Response.error("ERROR",errorResponse));
     }
 
 
