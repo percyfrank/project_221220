@@ -73,4 +73,24 @@ public class PostService {
         post.setTitle(request.getTitle());
         post.setBody(request.getBody());
     }
+
+
+    public Integer delete(Integer id, String userName, PostDeleteRequest request) {
+
+        // Authentication으로 넘어온 userName 확인, 없으면 삭제 불가
+        userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UserException(ErrorCode.USERNAME_NOT_FOUND));
+
+        // 삭제할 포스트 존재 확인
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
+        // 포스트를 삭제할 사용자와 포스트를 작성한자의 동일성 검증
+        if (!post.getUser().getUserName().equals(userName)) {
+            throw new PostException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        postRepository.deleteById(post.getId());
+        return request.getId();
+    }
 }

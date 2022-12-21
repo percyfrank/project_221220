@@ -26,12 +26,12 @@ public class PostApiController {
 
     // 포스트 생성
     @PostMapping("")
-    public Response<PostCreateResponse> addPost(@RequestBody PostCreateRequest request, Authentication authentication) {
+    public ResponseEntity<Response<PostCreateResponse>> addPost(@RequestBody PostCreateRequest request, Authentication authentication) {
         String userName = authentication.getName();
         log.info("userName : {}",userName);
         PostCreateResponse post = postService.createPost(request, userName);
         log.info("포스트 생성 성공");
-        return Response.success(new PostCreateResponse(post.getPostId(), post.getMessage()));
+        return ResponseEntity.ok().body(Response.success(new PostCreateResponse(post.getPostId(), post.getMessage())));
     }
 
     // 포스트 리스트
@@ -61,9 +61,21 @@ public class PostApiController {
         String userName = authentication.getName();
         postService.update(id, userName, request);
         PostDetailResponse findPost = postService.findPost(id);
-//        log.info("포스트 수정 성공");
+        log.info("포스트 수정 성공");
         return Response.success(new PostUpdateResponse(findPost.getId(), "포스트 수정 완료"));
     }
+
+    // 포스트 삭제
+    @DeleteMapping("{postId}")
+    public Response<PostDeleteResponse> deletePost(@PathVariable("postId") Integer id,
+                                                   @RequestBody @Valid PostDeleteRequest request,
+                                                   Authentication authentication) {
+        String userName = authentication.getName();
+        Integer deletedId = postService.delete(id, userName, request);
+        log.info("포스트 삭제 성공");
+        return Response.success(new PostDeleteResponse(deletedId, "포스트 삭제 완료"));
+    }
+
 
 
 }
