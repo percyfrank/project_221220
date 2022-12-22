@@ -27,9 +27,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserLoginResponse login(@RequestBody UserLoginRequest userLoginRequest) {
+    public Response<UserLoginResponse> login(@RequestBody UserLoginRequest userLoginRequest) {
         log.info("로그인 성공");
-        return new UserLoginResponse(userService.login(userLoginRequest.getUserName(),userLoginRequest.getPassword()));
+        return Response.success(new UserLoginResponse(userService.login(userLoginRequest.getUserName(),userLoginRequest.getPassword())));
     }
 
 
