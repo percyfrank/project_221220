@@ -67,7 +67,7 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
 
-        // 포스트를 수정한 사용자와 포스트를 최초 작성한자의 동일성 검증
+        // 포스트를 수정할 사용자와 포스트를 최초 작성한자의 동일성 검증
         if (!post.getUser().getUserName().equals(userName)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
