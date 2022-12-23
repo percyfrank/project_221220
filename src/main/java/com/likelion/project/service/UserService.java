@@ -6,7 +6,7 @@ import com.likelion.project.domain.dto.user.UserJoinRequest;
 import com.likelion.project.domain.dto.user.UserLoginResponse;
 import com.likelion.project.domain.entity.User;
 import com.likelion.project.exception.ErrorCode;
-import com.likelion.project.exception.UserException;
+import com.likelion.project.exception.AppException;
 import com.likelion.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,7 @@ public class UserService {
         // 중복 검사
         userRepository.findByUserName(userJoinRequest.getUserName())
                 .ifPresent((user -> {
-                    throw new UserException(ErrorCode.DUPLICATED_USER_NAME);
+                    throw new AppException(ErrorCode.DUPLICATED_USER_NAME);
                 }));
 
         // 회원 저장
@@ -46,11 +46,11 @@ public class UserService {
     public String login(String userName, String password) {
         // userName 존재 확인
         User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new UserException(ErrorCode.USERNAME_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
 
         // password 일치 여부 확인
         if(!encoder.matches(password,user.getPassword())) {
-            throw new UserException(ErrorCode.INVALID_PASSWORD);
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
 
         return JwtTokenUtil.createToken(userName, secretKey, expireTimeMs);
