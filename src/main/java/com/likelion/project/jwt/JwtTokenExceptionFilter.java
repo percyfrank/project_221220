@@ -1,4 +1,4 @@
-package com.likelion.project.configuration;
+package com.likelion.project.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likelion.project.exception.ErrorCode;

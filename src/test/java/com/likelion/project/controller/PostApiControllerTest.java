@@ -1,14 +1,12 @@
 package com.likelion.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.likelion.project.configuration.EncrypterConfig;
-import com.likelion.project.configuration.JwtTokenExceptionFilter;
-import com.likelion.project.configuration.JwtTokenFilter;
-import com.likelion.project.configuration.JwtTokenUtil;
+import com.likelion.project.jwt.JwtTokenExceptionFilter;
+import com.likelion.project.jwt.JwtTokenFilter;
+import com.likelion.project.jwt.JwtTokenUtil;
 import com.likelion.project.domain.dto.post.*;
 import com.likelion.project.domain.entity.Post;
 import com.likelion.project.exception.ErrorCode;
-import com.likelion.project.exception.AppException;
 import com.likelion.project.exception.AppException;
 import com.likelion.project.service.PostService;
 import com.likelion.project.service.UserService;
@@ -25,8 +23,6 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -37,11 +33,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

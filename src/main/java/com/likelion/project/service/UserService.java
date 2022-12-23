@@ -1,9 +1,8 @@
 package com.likelion.project.service;
 
-import com.likelion.project.configuration.JwtTokenUtil;
+import com.likelion.project.jwt.JwtTokenUtil;
 import com.likelion.project.domain.dto.user.UserDto;
 import com.likelion.project.domain.dto.user.UserJoinRequest;
-import com.likelion.project.domain.dto.user.UserLoginResponse;
 import com.likelion.project.domain.entity.User;
 import com.likelion.project.exception.ErrorCode;
 import com.likelion.project.exception.AppException;

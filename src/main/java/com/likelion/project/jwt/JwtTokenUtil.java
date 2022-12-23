@@ -1,4 +1,4 @@
-package com.likelion.project.configuration;
+package com.likelion.project.jwt;
 
 import com.likelion.project.domain.dto.user.UserLoginResponse;
 import io.jsonwebtoken.Claims;
