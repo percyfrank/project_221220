@@ -72,10 +72,9 @@ public class PostApiController {
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{postsId}")
     public Response<PostDeleteResponse> deletePost(@PathVariable("postsId") Integer id,
-                                                   @RequestBody @Valid PostDeleteRequest request,
                                                    Authentication authentication) {
         String userName = authentication.getName();
-        Integer deletedId = postService.delete(id, userName, request);
+        Integer deletedId = postService.delete(id, userName);
         log.info("포스트 삭제 성공");
         return Response.success(new PostDeleteResponse(deletedId, "포스트 삭제 완료"));
     }

@@ -336,7 +336,7 @@ class PostApiControllerTest {
         @WithMockUser
         public void post_delete_success() throws Exception {
             //when
-            when(postService.delete(any(), any(), any()))
+            when(postService.delete(any(), any()))
                     .thenReturn(postDeleteRequest.getId());
 
             //then
@@ -356,7 +356,7 @@ class PostApiControllerTest {
         @WithAnonymousUser
         public void post_delete_fail1() throws Exception {
             //when
-            when(postService.delete(any(), any(), any()))
+            when(postService.delete(any(), any()))
                     .thenThrow(new AppException(ErrorCode.INVALID_PERMISSION));
             //then
             mockMvc.perform(delete("/api/v1/posts/" + postDeleteRequest.getId())
@@ -372,7 +372,7 @@ class PostApiControllerTest {
         @WithMockUser
         public void post_delete_fail2() throws Exception {
             //when
-            when(postService.delete(any(), any(), any()))
+            when(postService.delete(any(), any()))
                     .thenThrow(new AppException(ErrorCode.POST_NOT_FOUND));
             //then
             mockMvc.perform(delete("/api/v1/posts/" + postDeleteRequest.getId())
@@ -393,7 +393,7 @@ class PostApiControllerTest {
         @WithMockUser
         public void post_delete_fail3() throws Exception {
             //when
-            when(postService.delete(any(), any(), any())).
+            when(postService.delete(any(), any())).
                     thenThrow(new AppException(ErrorCode.INVALID_PERMISSION));
 
             //then
@@ -415,7 +415,7 @@ class PostApiControllerTest {
         @WithMockUser
         public void post_delete_fail4() throws Exception {
             //when
-            when(postService.delete(any(), any(), any())).
+            when(postService.delete(any(), any())).
                     thenThrow(new AppException(ErrorCode.DATABASE_ERROR));
 
             //then

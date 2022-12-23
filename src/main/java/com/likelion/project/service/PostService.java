@@ -79,7 +79,7 @@ public class PostService {
     }
 
     @Transactional
-    public Integer delete(Integer id, String userName, PostDeleteRequest request) {
+    public Integer delete(Integer id, String userName) {
 
         // Authentication으로 넘어온 userName 확인, 없으면 삭제 불가
         userRepository.findByUserName(userName)
@@ -95,6 +95,6 @@ public class PostService {
         }
 
         postRepository.deleteById(post.getId());
-        return request.getId();
+        return id;
     }
 }
