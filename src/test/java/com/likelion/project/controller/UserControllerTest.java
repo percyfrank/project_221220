@@ -5,7 +5,7 @@ import com.likelion.project.domain.dto.user.UserDto;
 import com.likelion.project.domain.dto.user.UserJoinRequest;
 import com.likelion.project.domain.dto.user.UserLoginRequest;
 import com.likelion.project.exception.ErrorCode;
-import com.likelion.project.exception.UserException;
+import com.likelion.project.exception.AppException;
 import com.likelion.project.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
@@ -37,8 +38,8 @@ class UserControllerTest {
     UserService userService;
 
     UserJoinRequest userJoinRequest = UserJoinRequest.builder()
-            .userName("kos")
-            .password("1234")
+            .userName("user")
+            .password("password")
             .build();
 
     @Test
@@ -68,7 +69,7 @@ class UserControllerTest {
         //given
         //when
         when(userService.join(any()))
-                .thenThrow(new UserException(ErrorCode.DUPLICATED_USER_NAME));
+                .thenThrow(new AppException(ErrorCode.DUPLICATED_USER_NAME));
 
         mockMvc.perform(post("/api/v1/users/join")
                         .with(csrf())
@@ -99,7 +100,9 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(userLoginRequest)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.result.jwt").exists());
         //then
 
         verify(userService).login(any(), any());
@@ -111,7 +114,7 @@ class UserControllerTest {
     public void login_fail_empty_userName() throws Exception {
         //given
         //when
-        when(userService.login(any(), any())).thenThrow(new UserException(ErrorCode.USERNAME_NOT_FOUND));
+        when(userService.login(any(), any())).thenThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND));
 
         mockMvc.perform(post("/api/v1/users/login")
                         .with(csrf())
@@ -130,7 +133,7 @@ class UserControllerTest {
     public void login_fail_password_wrong() throws Exception {
         //given
         //when
-        when(userService.login(any(), any())).thenThrow(new UserException(ErrorCode.INVALID_PASSWORD));
+        when(userService.login(any(), any())).thenThrow(new AppException(ErrorCode.INVALID_PASSWORD));
 
         mockMvc.perform(post("/api/v1/users/login")
                         .with(csrf())
