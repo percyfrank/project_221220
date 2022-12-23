@@ -1,6 +1,7 @@
 package com.likelion.project.controller;
 
 import com.likelion.project.domain.dto.post.*;
+import com.likelion.project.domain.entity.Post;
 import com.likelion.project.exception.Response;
 import com.likelion.project.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class PostApiController {
     private final PostService postService;
 
     // 포스트 생성
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("")
     public ResponseEntity<Response<PostCreateResponse>> addPost(@RequestBody PostCreateRequest request, Authentication authentication) {
         String userName = authentication.getName();
@@ -36,12 +38,13 @@ public class PostApiController {
 
     // 포스트 리스트
     @GetMapping("")
-    public ResponseEntity<Page<PostResponse>> postList(
+    public Response<Page<PostResponse>> postList(
             @PageableDefault(size = 20, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         Page<PostResponse> allPost = postService.findAllPost(pageable);
         log.info("포스트 리스트 조회 성공");
-        return ResponseEntity.ok().body(allPost);
+//        return ResponseEntity.ok().body(allPost);
+        return Response.success(allPost);
     }
 
     // 포스트 상세
@@ -59,15 +62,16 @@ public class PostApiController {
                                                    @RequestBody @Valid PostUpdateRequest request,
                                                    Authentication authentication) {
         String userName = authentication.getName();
-        postService.update(id, userName, request);
-        PostDetailResponse findPost = postService.findPost(id);
+        Post updatedPost = postService.update(id, userName, request);
+//        PostDetailResponse findPost = postService.findPost(id);
         log.info("포스트 수정 성공");
-        return Response.success(new PostUpdateResponse(findPost.getId(), "포스트 수정 완료"));
+        return Response.success(new PostUpdateResponse(updatedPost.getId(), "포스트 수정 완료"));
     }
 
     // 포스트 삭제
-    @DeleteMapping("{postId}")
-    public Response<PostDeleteResponse> deletePost(@PathVariable("postId") Integer id,
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{postsId}")
+    public Response<PostDeleteResponse> deletePost(@PathVariable("postsId") Integer id,
                                                    @RequestBody @Valid PostDeleteRequest request,
                                                    Authentication authentication) {
         String userName = authentication.getName();
@@ -75,7 +79,4 @@ public class PostApiController {
         log.info("포스트 삭제 성공");
         return Response.success(new PostDeleteResponse(deletedId, "포스트 삭제 완료"));
     }
-
-
-
 }
