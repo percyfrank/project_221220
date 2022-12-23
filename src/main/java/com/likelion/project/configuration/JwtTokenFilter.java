@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private final UserService userService;
+//    private final UserService userService;
     private final String secretKey;
 
     @Override
@@ -38,9 +38,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         // 분리
-        String token;
+        final String token;
         try {
-            token = authentication.split(" ")[1];
+            token = authentication.split(" ")[1].trim();
         } catch (Exception e) {
             log.error("토큰 추출 실패");
             filterChain.doFilter(request, response);
@@ -54,11 +54,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 토큰에서 이름 추출
         String userName = JwtTokenUtil.getUserName(token, secretKey);
         log.info("userName : {}", userName);
 
-
-        // 권한 주거나 안주기
+        // 권한 부여에 관한 메서드
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userName, null,null);
 
