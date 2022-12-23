@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt사용하는 경우 씀
                 .and()
-                .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class) // UserNamePasswordAuthenticationFilter 적용하기 전에 JwtTokenFilter 적용한다는 의미
+                .addFilterBefore(new JwtTokenFilter(secretKey), UsernamePasswordAuthenticationFilter.class) // UserNamePasswordAuthenticationFilter 적용하기 전에 JwtTokenFilter 적용한다는 의미
+                .addFilterBefore(new JwtTokenExceptionFilter(),JwtTokenFilter.class)    // 인증
                 .build();
     }
 }
