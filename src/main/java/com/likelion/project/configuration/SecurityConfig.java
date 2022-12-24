@@ -29,15 +29,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .httpBasic().disable()
-                .csrf().disable()
+                .httpBasic().disable() //rest api 이므로 기본설정 사용안함. 기본설정은 비인증시 로그인폼 화면으로 리다이렉트
+                .csrf().disable()      //rest api 이므로 csrf 보안이 필요없음
                 .cors()
                 .and()
                     .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt사용하는 경우 씀
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //jwt token으로 인증시 세션 필요없으므로 생성안함
                 .and()
                     .authorizeRequests()
-                    .antMatchers("/api/v1/users/login","/api/v1/users/join", "/swagger-ui").permitAll() // join, login은 언제나 가능
+                    .antMatchers("/api/v1/users/login","/api/v1/users/join", "/swagger-ui").permitAll() // join, login 은 언제나 가능
                     .antMatchers(HttpMethod.GET,"/api/v1/**").permitAll()   // 모든 get 요청 허용
                     .antMatchers(HttpMethod.POST,"/api/v1/**").authenticated()  // 순서대로 적용이 되기 때문에 join, login 다음에 써주기
                 .and()
