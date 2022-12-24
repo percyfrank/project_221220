@@ -22,7 +22,7 @@ public class UserService {
     @Value("${jwt.token.secret}")
     private String secretKey;
 
-    private long expireTimeMs = 2000 * 60 * 60;
+    private long expireTimeMs = 500 * 60 * 60; // 토근 유효기간 30분 설정
 
     public UserDto join(UserJoinRequest userJoinRequest) {
 
