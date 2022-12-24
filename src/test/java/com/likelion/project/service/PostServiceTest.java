@@ -22,7 +22,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -34,32 +35,34 @@ class PostServiceTest {
     private PostRepository postRepository;
     @Mock
     private UserRepository userRepository;
-
     @InjectMocks
     private PostService postService;
+    private User user;
+    private User user2;
+    private Post post;
+    private Post mockPost;
+    private User mockUser;
 
-    @InjectMocks
-    private UserService userService;
-
-    private PostCreateRequest postCreateRequest;
-
-    private UserLoginRequest userLoginRequest;
-
+    @BeforeEach
+    void setup() {
+        user = User.builder().id(1).userName("user").password("password").build();
+        user2 = User.builder().id(2).userName("user2").password("password2").build();
+        post = Post.builder().id(1).title("title").body("body").user(user).build();
+        mockPost = mock(Post.class);
+        mockUser = mock(User.class);
+    }
 
     @Test
     @DisplayName("포스트 상세 조회 성공")
     void findPost_success() throws Exception {
-        //given
-        User user = User.builder().id(1).userName("user").build();
-        Post post = Post.builder().id(1).title("제목").body("내용").user(user).build();
         //when
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
-        PostDetailResponse postDetail = postService.findPost(1);
         //then
-        assertEquals(1,postDetail.getId());
-        assertEquals("제목",postDetail.getTitle());
-        assertEquals("내용",postDetail.getBody());
-        assertEquals("user",postDetail.getUserName());
+        PostDetailResponse postDetail = postService.findPost(1);
+        assertThat(postDetail.getId()).isEqualTo(1);
+        assertThat(postDetail.getTitle()).isEqualTo("title");
+        assertThat(postDetail.getBody()).isEqualTo("body");
+        assertThat(postDetail.getUserName()).isEqualTo("user");
         verify(postRepository, times(1)).findById(post.getId());
     }
 
@@ -67,22 +70,12 @@ class PostServiceTest {
     @DisplayName("포스트 등록")
     class PostCreate {
 
-        @BeforeEach
-        void setup() {
-            userLoginRequest = UserLoginRequest.builder().userName("user").password("password").build();
-            postCreateRequest = PostCreateRequest.builder().title("제목").body("내용").build();
-        }
-
-        @AfterEach
-        void setdown() {
-            postRepository.deleteAll();
-        }
-
         @Test
         @DisplayName("등록 성공")
         public void createPost_success() throws Exception {
-
             // given
+            UserLoginRequest userLoginRequest = UserLoginRequest.builder().userName("user").password("password").build();
+            PostCreateRequest postCreateRequest = PostCreateRequest.builder().title("제목").body("내용").build();
             User user = UserLoginRequest.toEntity(userLoginRequest);
             Post post = PostCreateRequest.toEntity(postCreateRequest);
             Integer fakePostId = 1;
@@ -90,11 +83,10 @@ class PostServiceTest {
             //when
             when(userRepository.findByUserName(userLoginRequest.getUserName())).thenReturn(Optional.of(user));
             when(postRepository.save(any())).thenReturn(post);
-            PostCreateResponse savedPost =
-                    postService.createPost(postCreateRequest,userLoginRequest.getUserName());
             //then
-            assertEquals(post.getId(),savedPost.getPostId());
-            assertEquals("포스트 등록 완료",savedPost.getMessage());
+            PostCreateResponse savedPost = postService.createPost(postCreateRequest,userLoginRequest.getUserName());
+            assertThat(savedPost.getPostId()).isEqualTo(post.getId());
+            assertThat(savedPost.getMessage()).isEqualTo("포스트 등록 완료");
             verify(userRepository, times(1)).findByUserName(userLoginRequest.getUserName());
             verify(postRepository, times(1)).save(any());
         }
@@ -102,17 +94,16 @@ class PostServiceTest {
         @Test
         @DisplayName("등록 실패 - 유저가 존재하지 않을 때")
         public void createPost_fail() throws Exception {
+            //given
+            UserLoginRequest userLoginRequest = UserLoginRequest.builder().userName("user").password("password").build();
+            PostCreateRequest postCreateRequest = PostCreateRequest.builder().title("제목").body("내용").build();
             //when
             when(userRepository.findByUserName(any())).thenThrow(new AppException(ErrorCode.INVALID_PERMISSION));
             //then
-//            assertThatThrownBy(() -> postService.createPost(postCreateRequest, "username"))
-//                    .isInstanceOf(AppException.class);
             AppException appException = assertThrows(AppException.class,
                     () -> postService.createPost(postCreateRequest, "username"));
-//            assertThat(ErrorCode.INVALID_PERMISSION).isEqualTo(AppException.getErrorCode());
-//            assertThat("사용자가 권한이 없습니다.").isEqualTo(AppException.getErrorCode().getMessage());
-            assertEquals(ErrorCode.INVALID_PERMISSION,appException.getErrorCode());
-            assertEquals("사용자가 권한이 없습니다.",appException.getErrorCode().getMessage());
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
             verify(userRepository, times(1)).findByUserName(any());
         }
     }
@@ -121,19 +112,10 @@ class PostServiceTest {
     @DisplayName("포스트 수정")
     class PostUpdate {
 
-        @AfterEach
-        void set() {
-            postRepository.deleteAll();
-        }
-
         @Test
         @DisplayName("수정 실패 : 포스트 존재하지 않음")
         @WithMockUser
         public void update_fail1() throws Exception {
-            //given
-            User user = User.builder().id(1).userName("user").build();
-            Post post = Post.builder().id(1).title("제목").body("내용").user(user).build();
-
             //when
             when(userRepository.findByUserName(user.getUserName())).thenReturn(Optional.of(user));
             when(postRepository.findById(post.getId())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND));
@@ -142,56 +124,43 @@ class PostServiceTest {
             AppException appException = assertThrows(AppException.class,
                     () -> postService.update(post.getId(), user.getUserName(), PostUpdateRequest.builder()
                             .title(post.getTitle()).body(post.getBody()).build()));
-            assertEquals(ErrorCode.POST_NOT_FOUND, appException.getErrorCode());
-            assertEquals("해당 포스트가 없습니다.", appException.getErrorCode().getMessage());
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.POST_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 포스트가 없습니다.");
         }
 
         @Test
         @DisplayName("수정 실패 : 작성자!=유저")
         public void update_fail2() throws Exception {
-
-            //given
-            User user1 = User.builder().userName("user1").password("password").build();
-            User user2 = User.builder().userName("user2").password("password2").build();
-            Post post = Post.builder().id(1).title("title").body("body").user(user1).build();
-
             //when
-            when(userRepository.findByUserName(user2.getUserName()))
-                    .thenThrow(new AppException(ErrorCode.INVALID_PERMISSION));
+            when(userRepository.findByUserName(user.getUserName()))
+                    .thenReturn(Optional.of(mockUser));
+            when(postRepository.findById(post.getId())).thenReturn(Optional.of(mockPost));
+            when(mockPost.getUser()).thenReturn(user2);
+
 //            when(postRepository.findById(post.getId())).thenReturn(Optional.of(post)); // @MockitoSettings(strictness = Strictness.LENIENT)가 있어야 함
-//            when(userRepository.findByUserName(user2.getUserName()))
-//                    .thenReturn(Optional.of(User.builder().userName(user2.getUserName()).password(user2.getPassword())
-//                            .build()));
+
             //then
             AppException appException = assertThrows(AppException.class,
-                    () -> postService.update(post.getId(), user2.getUserName(),
+                    () -> postService.update(post.getId(), user.getUserName(),
                             PostUpdateRequest.builder().title(post.getTitle()).body(post.getBody()).build()));
 
-            assertEquals(ErrorCode.INVALID_PERMISSION, appException.getErrorCode());
-            assertEquals("사용자가 권한이 없습니다.",appException.getErrorCode().getMessage());
-
-            verify(postRepository, never()).findById(post.getId());
-            verify(userRepository, times(1)).findByUserName(user2.getUserName());
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+            verify(userRepository, times(1)).findByUserName(user.getUserName());
         }
 
         @Test
         @DisplayName("수정 실패 : 유저 존재하지 않음")
         public void update_fail3() throws Exception {
-
-            //given
-            User user = User.builder().id(1).userName("user").build();
-            Post post = Post.builder().id(1).title("제목").body("내용").user(user).build();
             //when
-//            when(postRepository.findById(post.getId())).thenReturn(Optional.of(mock(Post.class))); // stubbing error
             when(userRepository.findByUserName(user.getUserName()))
                     .thenThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND));
-//            when(userRepository.findByUserName(user.getUserName())).thenReturn(Optional.empty());
             //then
             AppException appException = assertThrows(AppException.class,
-                    () -> postService.update(post.getId(), user.getUserName(), PostUpdateRequest.builder()
-                            .title(post.getTitle()).body(post.getBody()).build()));
-            assertEquals(ErrorCode.USERNAME_NOT_FOUND, appException.getErrorCode());
-            assertEquals("Not founded", appException.getErrorCode().getMessage());
+                    () -> postService.update(post.getId(), user.getUserName(),
+                            PostUpdateRequest.builder().title(post.getTitle()).body(post.getBody()).build()));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.USERNAME_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("Not founded");
         }
     }
 
@@ -202,33 +171,48 @@ class PostServiceTest {
         @Test
         @DisplayName("삭제 실패 : 유저 존재하지 않음")
         public void delete_fail1() throws Exception {
-            //given
-
             //when
-
+            when(userRepository.findByUserName(user.getUserName()))
+                    .thenReturn(Optional.empty());
+//            when(userRepository.findByUserName(user.getUserName()))
+//                    .thenThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND));
             //then
+            AppException appException = assertThrows(AppException.class,
+                    () -> postService.delete(post.getId(), user.getUserName()));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.USERNAME_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("Not founded");
         }
 
         @Test
         @DisplayName("삭제 실패 : 포스트 존재하지 않음")
         public void delete_fail2() throws Exception {
-            //given
-
             //when
+            when(userRepository.findByUserName(user.getUserName())).thenReturn(Optional.of(mockUser));
+//            when(postRepository.findById(post.getId())).thenThrow(new AppException(ErrorCode.POST_NOT_FOUND));
+            when(postRepository.findById(post.getId())).thenReturn(Optional.empty());
 
             //then
+            AppException appException = assertThrows(AppException.class,
+                    () -> postService.delete(post.getId(), user.getUserName()));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.POST_NOT_FOUND);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 포스트가 없습니다.");
         }
 
         @Test
-        @DisplayName("삭제 실패 : 작성자와 유저가 존재하지 않음")
+        @DisplayName("삭제 실패 : 작성자와 유저가 같지 않음")
         public void delete_fail3() throws Exception {
-            //given
-
             //when
+            when(userRepository.findByUserName(user.getUserName()))
+                    .thenReturn(Optional.of(mockUser));
+            when(postRepository.findById(post.getId())).thenReturn(Optional.of(mockPost));
+            when(mockPost.getUser()).thenReturn(user2);
 
             //then
+            AppException appException = assertThrows(AppException.class,
+                    () -> postService.delete(post.getId(), user.getUserName()));
+            assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
+            assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
+            verify(userRepository, times(1)).findByUserName(user.getUserName());
         }
-
     }
-
 }
