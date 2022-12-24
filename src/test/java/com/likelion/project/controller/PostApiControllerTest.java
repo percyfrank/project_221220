@@ -166,7 +166,7 @@ class PostApiControllerTest {
 
             mockMvc = MockMvcBuilders
                     .webAppContextSetup(context)
-                    .addFilters(new CharacterEncodingFilter("UTF-8", true))
+                    .addFilters(new CharacterEncodingFilter("UTF-8", true)) // 한글 깨짐 방지 필터
                     .addFilters(new JwtTokenExceptionFilter())
                     .addFilters(new JwtTokenFilter("secret"))
                     .addFilters(new UsernamePasswordAuthenticationFilter())
