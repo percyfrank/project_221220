@@ -28,19 +28,19 @@ public class JwtTokenExceptionFilter extends OncePerRequestFilter {
             log.info("검증 시작");
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {       // 유효기간 만료 토큰
-            log.info("만료된 JWT 토큰입니다.");
+            log.error("만료된 JWT 토큰입니다.");
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
         } catch (MalformedJwtException  e) {     // 구성이 잘못된 토큰(헤더,내용,서명이 없는 경우)
-            log.info("올바르게 구성되지 못한 JWT 토큰입니다.");
+            log.error("올바르게 구성되지 못한 JWT 토큰입니다.");
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
         } catch (SignatureException e) {        // 서명을 확인할 수 없는 토큰
-            log.info("서명을 확인할 수 없는 토큰입니다.");
+            log.error("서명을 확인할 수 없는 토큰입니다.");
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
         } catch (UnsupportedJwtException e) {   // 형식이 이상한 토큰
-            log.info("지원하지 않는 형식의 JWT 토큰입니다.");
+            log.error("지원하지 않는 형식의 JWT 토큰입니다.");
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
-        } catch (IllegalArgumentException e) {  // 잘못된 토큰
-            log.info("잘못된 JWT 토큰입니다.");
+        } catch (IllegalArgumentException | JwtException e) {  // 잘못된 토큰
+            log.error("잘못된 JWT 토큰입니다.");
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
 
         }
