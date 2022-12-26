@@ -170,8 +170,7 @@ class PostServiceTest {
         public void delete_fail1() throws Exception {
 
             given(userRepository.findByUserName(user.getUserName())).willReturn(Optional.empty());
-//            given(userRepository.findByUserName(user.getUserName()))
-//                    .willThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND));
+//            given(userRepository.findByUserName(user.getUserName())).willThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND));
 
             AppException appException = assertThrows(AppException.class,
                     () -> postService.delete(post.getId(), user.getUserName()));
@@ -197,8 +196,7 @@ class PostServiceTest {
         @DisplayName("삭제 실패 : 작성자와 유저가 같지 않음")
         public void delete_fail3() throws Exception {
 
-            given(userRepository.findByUserName(user.getUserName()))
-                    .willReturn(Optional.of(mockUser));
+            given(userRepository.findByUserName(user.getUserName())).willReturn(Optional.of(mockUser));
             given(postRepository.findById(post.getId())).willReturn(Optional.of(mockPost));
             given(mockPost.getUser()).willReturn(user2);
 
