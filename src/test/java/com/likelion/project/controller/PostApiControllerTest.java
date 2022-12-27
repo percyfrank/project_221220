@@ -89,13 +89,13 @@ class PostApiControllerTest {
             Integer postsId = 1;
             given(postService.findPost(postsId)).willReturn(postDetailResponse);
 
-            mockMvc.perform(get("/api/v1/posts/" + postsId))
-//                            .contentType(MediaType.APPLICATION_JSON)
-//                            .content(objectMapper.writeValueAsBytes(postDetailResponse)))
+            mockMvc.perform(get("/api/v1/posts/" + postsId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(postDetailResponse)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value(1))
-                    .andExpect(jsonPath("$.title").value("title"))
-                    .andExpect(jsonPath("$.body").value("body"))
+                    .andExpect(jsonPath("$.result.id").value(1))
+                    .andExpect(jsonPath("$.result.title").value("title"))
+                    .andExpect(jsonPath("$.result.body").value("body"))
                     .andDo(print());
 
             verify(postService,times(1)).findPost(postsId);
