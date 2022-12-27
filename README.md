@@ -1,14 +1,30 @@
 # MutsaSNS
-
-## 멋쟁이사자처럼 백엔드스쿨 2기 학생들의 학습 내용 정리를 위한 게시판
+**멋쟁이사자처럼 백엔드스쿨 2기 학생들의 학습 내용 정리를 위한 게시판**
 
 ## 요구사항
 - [ ] Swagger
 - [ ] 회원가입
+  - 중복가입 시 에러 발생 확인
 - [ ] 로그인
+  - 인증되지 않는 상황 에러 확인
 - [ ] 포스트 작성, 수정, 삭제, 리스트
+  - 작성, 수정, 삭제는 회원만 가능
+  - 리스트 조회는 모두 가능
+  - 회원만 가능한 기능에서의 인증 에러 확인
 - [ ] AWS EC2에 Docker 배포
 - [ ] Gitlab CI & Crontab CD
+  - 프로젝트 업데이트 여부 확인 후 재배포 확인
+  - Dockerfile, crontab 정상 작동 확인
+
+## 개발 환경
+- JAVA 11
+- Editor : Intellij Ultimate
+- Framework : SpringBoot 2.7.5
+- Build : Gradle 6.8
+- Server : AWS EC2
+- Deploy : Docker
+- DB : MySql 8.0
+- Library : SpringBoot Web, MySQL, Spring Data JPA, Lombok, Spring Security, Swagger
 
 ## URL
 > http://ec2-3-34-28-158.ap-northeast-2.compute.amazonaws.com:8080
@@ -31,14 +47,13 @@ POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 포스트가 없습니다.")
 DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 ```
 
-
 ## Endpoint
 
 ### User
 
 ---
 
-#### <span style="color:blue">회원가입</span>
+#### 회원가입
 `POST /api/v1/join`
 
 ##### Request
@@ -61,7 +76,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 ```
 
 
-#### <span style="color:blue">로그인</span>
+#### 로그인
 `POST /api/v1/login`
 ##### Request
 ```json
@@ -87,7 +102,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 
 ---
 
-#### <span style="color:blue">포스트 List</span>
+#### 포스트 List
 `GET /api/v1/posts`
 
 ##### Response
@@ -141,7 +156,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 }
 ```
 
-#### <span style="color:blue">포스트 상세</span>
+#### 포스트 상세
 `GET /api/v1/posts/{postsId}`
 - id, 제목, 내용, 작성자, 작성날짜, 수정날짜
 ##### Response
@@ -159,7 +174,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 }
 ```
 
-#### <span style="color:blue">포스트 등록</span>
+#### 포스트 등록
 `POST /api/v1/posts`
 ##### Request
 ```json
@@ -178,7 +193,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
     }
 }
 ```
-#### <span style="color:blue">포스트 수정</span>
+#### 포스트 수정
 `PUT /api/v1/posts/{postsId}`
 ##### Request
 ```json
@@ -197,7 +212,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
     }
 }
 ```
-#### <span style="color:blue">포스트 삭제</span>
+#### 포스트 삭제
 `DELETE /api/v1/posts/{postsId}`
 ##### Response
 ```json
