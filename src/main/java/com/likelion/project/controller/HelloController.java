@@ -9,6 +9,6 @@ public class HelloController {
 
     @RequestMapping ("/api/v1/hello")
     public String hello() {
-        return "happy_new_year";
+        return "권오석";
     }
 }
