@@ -26,14 +26,14 @@ public class PostApiController {
     private final PostService postService;
 
     // 포스트 생성
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     @PostMapping("")
-    public ResponseEntity<Response<PostCreateResponse>> addPost(@RequestBody PostCreateRequest request, Authentication authentication) {
+    public Response<PostCreateResponse> addPost(@RequestBody PostCreateRequest request, Authentication authentication) {
         String userName = authentication.getName();
         log.info("userName : {}",userName);
         PostCreateResponse post = postService.createPost(request, userName);
         log.info("포스트 생성 성공");
-        return ResponseEntity.ok().body(Response.success(new PostCreateResponse(post.getPostId(), post.getMessage())));
+        return Response.success(new PostCreateResponse(post.getPostId(), post.getMessage()));
     }
 
     // 포스트 리스트
@@ -49,14 +49,14 @@ public class PostApiController {
 
     // 포스트 상세
     @GetMapping("/{postsId}")
-    public ResponseEntity<PostDetailResponse> postDetail(@PathVariable("postsId") Integer id) {
+    public Response<PostDetailResponse> postDetail(@PathVariable("postsId") Integer id) {
         PostDetailResponse post = postService.findPost(id);
         log.info("포스트 상세 조회 성공");
-        return ResponseEntity.ok().body(post);
+        return Response.success(post);
     }
 
     // 포스트 수정
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{postsId}")
     public Response<PostUpdateResponse> updatePost(@PathVariable("postsId") Integer id,
                                                    @RequestBody @Valid PostUpdateRequest request,
@@ -69,7 +69,7 @@ public class PostApiController {
     }
 
     // 포스트 삭제
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{postsId}")
     public Response<PostDeleteResponse> deletePost(@PathVariable("postsId") Integer id,
                                                    Authentication authentication) {
