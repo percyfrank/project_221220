@@ -38,7 +38,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 
 ---
 
-#### 회원가입
+#### <span style="color:blue">회원가입</span>
 `POST /api/v1/join`
 
 ##### Request
@@ -61,7 +61,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 ```
 
 
-#### 로그인
+#### <span style="color:blue">로그인</span>
 `POST /api/v1/login`
 ##### Request
 ```json
@@ -87,7 +87,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 
 ---
 
-#### 포스트 List
+#### <span style="color:blue">포스트 List</span>
 `GET /api/v1/posts`
 
 ##### Response
@@ -141,7 +141,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 }
 ```
 
-#### 포스트 상세
+#### <span style="color:blue">포스트 상세</span>
 `GET /api/v1/posts/{postsId}`
 - id, 제목, 내용, 작성자, 작성날짜, 수정날짜
 ##### Response
@@ -159,7 +159,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
 }
 ```
 
-#### 포스트 등록
+#### <span style="color:blue">포스트 등록</span>
 `POST /api/v1/posts`
 ##### Request
 ```json
@@ -178,7 +178,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
     }
 }
 ```
-#### 포스트 수정
+#### <span style="color:blue">포스트 수정</span>
 `PUT /api/v1/posts/{postsId}`
 ##### Request
 ```json
@@ -197,7 +197,7 @@ DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB에러")
     }
 }
 ```
-#### 포스트 삭제
+#### <span style="color:blue">포스트 삭제</span>
 `DELETE /api/v1/posts/{postsId}`
 ##### Response
 ```json
