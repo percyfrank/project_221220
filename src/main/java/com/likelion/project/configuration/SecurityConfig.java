@@ -40,6 +40,8 @@ public class SecurityConfig {
                     .antMatchers("/api/v1/users/login","/api/v1/users/join", "/swagger-ui").permitAll() // join, login 은 언제나 가능
                     .antMatchers(HttpMethod.GET,"/api/v1/**").permitAll()   // 모든 get 요청 허용
                     .antMatchers(HttpMethod.POST,"/api/v1/**").authenticated()  // 순서대로 적용이 되기 때문에 join, login 다음에 써주기
+                    .antMatchers(HttpMethod.PUT, "/api/v1/**").authenticated()
+                    .antMatchers(HttpMethod.DELETE, "/api/v1/**").authenticated()
                 .and()
                     .addFilterBefore(new JwtTokenFilter(secretKey), UsernamePasswordAuthenticationFilter.class) // UserNamePasswordAuthenticationFilter 적용하기 전에 JwtTokenFilter 적용한다는 의미
                     .addFilterBefore(new JwtTokenExceptionFilter(),JwtTokenFilter.class)    // 인증
