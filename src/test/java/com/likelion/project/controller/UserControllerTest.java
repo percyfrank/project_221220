@@ -1,9 +1,7 @@
 package com.likelion.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.likelion.project.domain.dto.user.UserDto;
-import com.likelion.project.domain.dto.user.UserJoinRequest;
-import com.likelion.project.domain.dto.user.UserLoginRequest;
+import com.likelion.project.domain.dto.user.*;
 import com.likelion.project.exception.ErrorCode;
 import com.likelion.project.exception.AppException;
 import com.likelion.project.service.UserService;
@@ -37,10 +35,9 @@ class UserControllerTest {
     @MockBean
     UserService userService;
 
-    UserJoinRequest userJoinRequest = UserJoinRequest.builder()
-            .userName("user")
-            .password("password")
-            .build();
+    UserJoinRequest userJoinRequest = UserJoinRequest.builder().userName("user").password("password").build();
+    UserJoinResponse userJoinResponse = UserJoinResponse.builder().userId(1).userName("user").build();
+    UserLoginResponse userLoginResponse = new UserLoginResponse("jwt");
 
     @Test
     @DisplayName("회원가입 성공")
@@ -48,7 +45,7 @@ class UserControllerTest {
     public void join_success() throws Exception {
         //given
         //when
-        when(userService.join(any())).thenReturn(mock(UserDto.class));
+        when(userService.join(any())).thenReturn(userJoinResponse);
 
         mockMvc.perform(post("/api/v1/users/join")
                         .with(csrf())
@@ -93,7 +90,7 @@ class UserControllerTest {
     public void login_success() throws Exception {
         //given
         //when
-        when(userService.login(any(), any())).thenReturn("token");
+        when(userService.login(any(), any())).thenReturn(userLoginResponse);
 
         mockMvc.perform(post("/api/v1/users/login")
                         .with(csrf())

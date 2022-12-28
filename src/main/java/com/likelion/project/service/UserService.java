@@ -1,5 +1,7 @@
 package com.likelion.project.service;
 
+import com.likelion.project.domain.dto.user.UserJoinResponse;
+import com.likelion.project.domain.dto.user.UserLoginResponse;
 import com.likelion.project.jwt.JwtTokenUtil;
 import com.likelion.project.domain.dto.user.UserDto;
 import com.likelion.project.domain.dto.user.UserJoinRequest;
@@ -24,7 +26,7 @@ public class UserService {
 
     private long expireTimeMs = 500 * 60 * 60; // 토근 유효기간 30분 설정
 
-    public UserDto join(UserJoinRequest userJoinRequest) {
+    public UserJoinResponse join(UserJoinRequest userJoinRequest) {
 
         // 중복 검사
         userRepository.findByUserName(userJoinRequest.getUserName())
@@ -36,13 +38,13 @@ public class UserService {
         User savedUser = userRepository.save(
                 userJoinRequest.toEntity(encoder.encode(userJoinRequest.getPassword())));
 
-        return UserDto.builder()
-                .id(savedUser.getId())
+        return UserJoinResponse.builder()
+                .userId(savedUser.getId())
                 .userName(savedUser.getUserName())
                 .build();
     }
 
-    public String login(String userName, String password) {
+    public UserLoginResponse login(String userName, String password) {
         // userName 존재 확인
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
@@ -52,6 +54,6 @@ public class UserService {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return JwtTokenUtil.createToken(userName, secretKey, expireTimeMs);
+        return new UserLoginResponse(JwtTokenUtil.createToken(userName, secretKey, expireTimeMs));
     }
 }
