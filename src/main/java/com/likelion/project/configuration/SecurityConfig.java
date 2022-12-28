@@ -21,8 +21,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true)
 public class SecurityConfig {
 
-    private final UserService userService;
-
     @Value("${jwt.token.secret}")
     private String secretKey;
 
@@ -42,6 +40,8 @@ public class SecurityConfig {
                     .antMatchers(HttpMethod.POST,"/api/v1/**").authenticated()  // 순서대로 적용이 되기 때문에 join, login 다음에 써주기
                     .antMatchers(HttpMethod.PUT, "/api/v1/**").authenticated()
                     .antMatchers(HttpMethod.DELETE, "/api/v1/**").authenticated()
+                .and()
+                    .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())// 토큰 없을 시 에러 처리
                 .and()
                     .addFilterBefore(new JwtTokenFilter(secretKey), UsernamePasswordAuthenticationFilter.class) // UserNamePasswordAuthenticationFilter 적용하기 전에 JwtTokenFilter 적용한다는 의미
                     .addFilterBefore(new JwtTokenExceptionFilter(),JwtTokenFilter.class)    // 인증
