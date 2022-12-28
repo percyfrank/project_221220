@@ -33,7 +33,7 @@ public class PostApiController {
         log.info("userName : {}",userName);
         PostCreateResponse post = postService.createPost(request, userName);
         log.info("포스트 생성 성공");
-        return Response.success(new PostCreateResponse(post.getPostId(), post.getMessage()));
+        return Response.success(post);
     }
 
     // 포스트 리스트
@@ -62,10 +62,9 @@ public class PostApiController {
                                                    @RequestBody @Valid PostUpdateRequest request,
                                                    Authentication authentication) {
         String userName = authentication.getName();
-        Post updatedPost = postService.update(id, userName, request);
-//        PostDetailResponse findPost = postService.findPost(id);
+        Integer updatedId = postService.update(id, userName, request);
         log.info("포스트 수정 성공");
-        return Response.success(new PostUpdateResponse(updatedPost.getId(), "포스트 수정 완료"));
+        return Response.success(new PostUpdateResponse(updatedId, "포스트 수정 완료"));
     }
 
     // 포스트 삭제

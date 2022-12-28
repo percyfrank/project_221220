@@ -19,13 +19,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
 
-    @Transactional
     public PostCreateResponse createPost(PostCreateRequest request, String userName) {
 
         // Authentication으로 넘어온 userName 확인, 없으면 등록 불가
@@ -42,13 +42,11 @@ public class PostService {
         return PostCreateResponse.of(savedPost);
     }
 
-    @Transactional
     public Page<PostResponse> findAllPost(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
         return posts.map(PostResponse::of);
     }
 
-    @Transactional
     public PostDetailResponse findPost(Integer id) {
         // post 조회
         Post post = postRepository.findById(id)
@@ -57,8 +55,7 @@ public class PostService {
         return PostDetailResponse.of(post);
     }
 
-    @Transactional
-    public Post update(Integer id, String userName, PostUpdateRequest request) {
+    public Integer update(Integer id, String userName, PostUpdateRequest request) {
         // Authentication으로 넘어온 userName 확인, 없으면 수정 불가
         userRepository.findByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
@@ -72,13 +69,11 @@ public class PostService {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 
-        post.setTitle(request.getTitle());
-        post.setBody(request.getBody());
+        post.updatePost(request.getTitle(),request.getBody());
         Post savedPost = postRepository.save(post);
-        return savedPost;
+        return savedPost.getId();
     }
 
-    @Transactional
     public Integer delete(Integer id, String userName) {
 
         // Authentication으로 넘어온 userName 확인, 없으면 삭제 불가

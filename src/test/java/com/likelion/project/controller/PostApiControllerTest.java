@@ -218,7 +218,7 @@ class PostApiControllerTest {
         @WithMockCustomUser
         public void post_update_success() throws Exception {
 
-            given(postService.update(any(), any(), any())).willReturn(post);
+            given(postService.update(any(), any(), any())).willReturn(post.getId());
 
             mockMvc.perform(put("/api/v1/posts/1")
                             .with(csrf())
