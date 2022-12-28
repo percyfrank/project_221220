@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PostService {
 
     private final PostRepository postRepository;
@@ -41,12 +41,12 @@ public class PostService {
         Post savedPost = postRepository.save(post);
         return PostCreateResponse.of(savedPost);
     }
-
+    @Transactional
     public Page<PostResponse> findAllPost(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
         return posts.map(PostResponse::of);
     }
-
+    @Transactional
     public PostDetailResponse findPost(Integer id) {
         // post 조회
         Post post = postRepository.findById(id)
