@@ -8,6 +8,7 @@ import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -17,15 +18,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Component
 @Slf4j
 public class JwtTokenExceptionFilter extends OncePerRequestFilter {
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            log.info("검증 시작");
+//            log.info("토큰 검증 시작");
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {       // 유효기간 만료 토큰
             log.error("만료된 JWT 토큰입니다.");
@@ -50,6 +51,7 @@ public class JwtTokenExceptionFilter extends OncePerRequestFilter {
 
         response.setStatus(errorCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
 
         ObjectMapper objectMapper = new ObjectMapper();
 //        Gson gson = new Gson();

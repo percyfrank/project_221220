@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 
@@ -28,9 +29,8 @@ public class PostApiController {
     // 포스트 생성
 //    @PreAuthorize("isAuthenticated()")
     @PostMapping("")
-    public Response<PostCreateResponse> addPost(@RequestBody PostCreateRequest request, Authentication authentication) {
+    public Response<PostCreateResponse> addPost(@RequestBody PostCreateRequest request, @ApiIgnore Authentication authentication) {
         String userName = authentication.getName();
-        log.info("userName : {}",userName);
         PostCreateResponse post = postService.createPost(request, userName);
         log.info("포스트 생성 성공");
         return Response.success(post);

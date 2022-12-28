@@ -24,28 +24,29 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        // 헤더에서 토큰 꺼내기
         final String authentication = request.getHeader(HttpHeaders.AUTHORIZATION);
-        log.info("authentication : {}", authentication);
 
-        // 토근 없거나 이상한 토근 확인 작업
+        // 토근 없거나 이상한 토큰 헤더 형식 확인
         if(authentication == null || !authentication.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 분리
+        // 토큰 분리
         final String token;
         try {
+            log.info("authentication : {}", authentication);
             token = authentication.split(" ")[1].trim();
         } catch (Exception e) {
-            log.error("토큰 추출 실패");
+            log.error("토큰 추출을 실패했습니다.");
             filterChain.doFilter(request, response);
             return;
         }
 
         // 만료 확인 작업
         if (JwtTokenUtil.isExpired(token,secretKey)) {
-            log.error("토큰 만료");
+            log.error("토큰이 만료되었습니다.");
             filterChain.doFilter(request,response);
             return;
         }
@@ -61,7 +62,5 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
-
-
     }
 }
