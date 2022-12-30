@@ -41,6 +41,7 @@ import static com.likelion.project.exception.ErrorCode.INVALID_TOKEN;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -218,7 +219,7 @@ class PostApiControllerTest {
         @WithMockCustomUser
         public void post_update_success() throws Exception {
 
-            given(postService.update(any(), any(), any())).willReturn(post.getId());
+            doNothing().when(postService).update(any(),any(),any());
 
             mockMvc.perform(put("/api/v1/posts/1")
                             .with(csrf())
@@ -264,7 +265,7 @@ class PostApiControllerTest {
         @WithMockCustomUser
         public void post_update_fail2() throws Exception {
 
-            given(postService.update(any(), any(), any())).willThrow(new AppException(ErrorCode.POST_NOT_FOUND));
+            doThrow(new AppException(ErrorCode.POST_NOT_FOUND)).when(postService).update(any(),any(), any());
 
             mockMvc.perform(put("/api/v1/posts/1")
                             .with(csrf())
@@ -285,7 +286,7 @@ class PostApiControllerTest {
         @WithMockCustomUser
         public void post_update_fail3() throws Exception {
 
-            given(postService.update(any(), any(), any())).willThrow(new AppException(ErrorCode.INVALID_PERMISSION));
+            doThrow(new AppException(ErrorCode.INVALID_PERMISSION)).when(postService).update(any(),any(), any());
 
             mockMvc.perform(put("/api/v1/posts/1")
                             .with(csrf())
@@ -305,7 +306,7 @@ class PostApiControllerTest {
         @WithMockUser
         public void post_update_fail4() throws Exception {
 
-            given(postService.update(any(), any(), any())).willThrow(new AppException(ErrorCode.DATABASE_ERROR));
+            doThrow(new AppException(ErrorCode.DATABASE_ERROR)).when(postService).update(any(),any(), any());
 
             mockMvc.perform(put("/api/v1/posts/1")
                             .with(csrf())
@@ -335,7 +336,7 @@ class PostApiControllerTest {
         @WithMockCustomUser
         public void post_delete_success() throws Exception {
 
-            given(postService.delete(any(), any())).willReturn(postDeleteRequest.getId());
+            doNothing().when(postService).delete(any(), any());
 
             mockMvc.perform(delete("/api/v1/posts/" + postDeleteRequest.getId())
                             .with(csrf())
@@ -382,7 +383,7 @@ class PostApiControllerTest {
         @DisplayName("포스트 삭제 실패(2) : 삭제할 포스트 없음")
         @WithMockCustomUser
         public void post_delete_fail2() throws Exception {
-            given(postService.delete(any(), any())).willThrow(new AppException(ErrorCode.POST_NOT_FOUND));
+            doThrow(new AppException(ErrorCode.POST_NOT_FOUND)).when(postService).delete(any(), any());
 
             mockMvc.perform(delete("/api/v1/posts/" + postDeleteRequest.getId())
                             .with(csrf())
@@ -402,7 +403,7 @@ class PostApiControllerTest {
         @WithMockCustomUser
         public void post_delete_fail3() throws Exception {
 
-            given(postService.delete(any(), any())).willThrow(new AppException(ErrorCode.INVALID_PERMISSION));
+            doThrow(new AppException(ErrorCode.INVALID_PERMISSION)).when(postService).delete(any(), any());
 
             mockMvc.perform(delete("/api/v1/posts/" + postDeleteRequest.getId())
                             .with(csrf())
@@ -422,7 +423,7 @@ class PostApiControllerTest {
         @WithMockCustomUser
         public void post_delete_fail4() throws Exception {
 
-            given(postService.delete(any(), any())).willThrow(new AppException(ErrorCode.DATABASE_ERROR));
+            doThrow(new AppException(ErrorCode.DATABASE_ERROR)).when(postService).delete(any(), any());
 
             mockMvc.perform(delete("/api/v1/posts/" + postDeleteRequest.getId())
                             .with(csrf())
