@@ -62,9 +62,9 @@ public class PostApiController {
                                                    @RequestBody @Valid PostUpdateRequest request,
                                                    Authentication authentication) {
         String userName = authentication.getName();
-        Integer updatedId = postService.update(id, userName, request);
+        postService.update(id, userName, request);
         log.info("포스트 수정 성공");
-        return Response.success(new PostUpdateResponse(updatedId, "포스트 수정 완료"));
+        return Response.success(new PostUpdateResponse(id, "포스트 수정 완료"));
     }
 
     // 포스트 삭제
@@ -73,8 +73,8 @@ public class PostApiController {
     public Response<PostDeleteResponse> deletePost(@PathVariable("postsId") Integer id,
                                                    Authentication authentication) {
         String userName = authentication.getName();
-        Integer deletedId = postService.delete(id, userName);
+        postService.delete(id, userName);
         log.info("포스트 삭제 성공");
-        return Response.success(new PostDeleteResponse(deletedId, "포스트 삭제 완료"));
+        return Response.success(new PostDeleteResponse(id, "포스트 삭제 완료"));
     }
 }

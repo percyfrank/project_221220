@@ -55,7 +55,19 @@ public class PostService {
         return PostDetailResponse.of(post);
     }
 
-    public Integer update(Integer id, String userName, PostUpdateRequest request) {
+    public void update(Integer id, String userName, PostUpdateRequest request) {
+
+        Post post = validatePost(id, userName);
+        post.updatePost(request.getTitle(),request.getBody());
+    }
+
+
+    public void delete(Integer id, String userName) {
+
+        Post post = validatePost(id, userName);
+        postRepository.deleteById(post.getId());
+    }
+    private Post validatePost(Integer id, String userName) {
         // Authentication으로 넘어온 userName 확인, 없으면 수정 불가
         userRepository.findByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
@@ -68,28 +80,6 @@ public class PostService {
         if (!post.getUser().getUserName().equals(userName)) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
-
-        post.updatePost(request.getTitle(),request.getBody());
-        Post savedPost = postRepository.save(post);
-        return savedPost.getId();
-    }
-
-    public Integer delete(Integer id, String userName) {
-
-        // Authentication으로 넘어온 userName 확인, 없으면 삭제 불가
-        userRepository.findByUserName(userName)
-                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
-
-        // 삭제할 포스트 존재 확인
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
-
-        // 포스트를 삭제할 사용자와 포스트를 작성한자의 동일성 검증
-        if (!post.getUser().getUserName().equals(userName)) {
-            throw new AppException(ErrorCode.INVALID_PERMISSION);
-        }
-
-        postRepository.deleteById(post.getId());
-        return id;
+        return post;
     }
 }
