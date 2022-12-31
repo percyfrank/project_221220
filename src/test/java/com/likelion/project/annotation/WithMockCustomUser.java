@@ -1,4 +1,4 @@
-package com.likelion.project.controller;
+package com.likelion.project.annotation;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 
