@@ -1,5 +1,6 @@
 package com.likelion.project.configuration;
 
+import com.likelion.project.jwt.CustomAuthenticationEntryPoint;
 import com.likelion.project.jwt.JwtTokenExceptionFilter;
 import com.likelion.project.jwt.JwtTokenFilter;
 import com.likelion.project.service.UserService;
