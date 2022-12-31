@@ -27,7 +27,6 @@ public class PostApiController {
     private final PostService postService;
 
     // 포스트 생성
-//    @PreAuthorize("isAuthenticated()")
     @PostMapping("")
     public Response<PostCreateResponse> addPost(@RequestBody PostCreateRequest request, @ApiIgnore Authentication authentication) {
         String userName = authentication.getName();
@@ -56,7 +55,6 @@ public class PostApiController {
     }
 
     // 포스트 수정
-//    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{postsId}")
     public Response<PostUpdateResponse> updatePost(@PathVariable("postsId") Integer id,
                                                    @RequestBody @Valid PostUpdateRequest request,
@@ -68,7 +66,6 @@ public class PostApiController {
     }
 
     // 포스트 삭제
-//    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{postsId}")
     public Response<PostDeleteResponse> deletePost(@PathVariable("postsId") Integer id,
                                                    Authentication authentication) {

@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class PostService {
 
     private final PostRepository postRepository;
@@ -41,12 +41,14 @@ public class PostService {
         Post savedPost = postRepository.save(post);
         return PostCreateResponse.of(savedPost);
     }
-    @Transactional
+
+    @Transactional(readOnly = true)
     public Page<PostResponse> findAllPost(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
         return posts.map(PostResponse::of);
     }
-    @Transactional
+
+    @Transactional(readOnly = true)
     public PostDetailResponse findPost(Integer id) {
         // post 조회
         Post post = postRepository.findById(id)
@@ -61,12 +63,12 @@ public class PostService {
         post.updatePost(request.getTitle(),request.getBody());
     }
 
-
     public void delete(Integer id, String userName) {
 
         Post post = validatePost(id, userName);
         postRepository.deleteById(post.getId());
     }
+
     private Post validatePost(Integer id, String userName) {
         // Authentication으로 넘어온 userName 확인, 없으면 수정 불가
         userRepository.findByUserName(userName)
