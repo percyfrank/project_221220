@@ -85,4 +85,22 @@ public class PostApiController {
         log.info("마이피드 조회 성공");
         return Response.success(posts);
     }
+
+    // 좋아요 누르기
+    @PostMapping("/{postId}/likes")
+    public Response<String> updateLike(@PathVariable("postId") Integer postId,
+                                             Authentication authentication) {
+
+        postService.like(postId, authentication.getName());
+        log.info("좋아요 누르기 성공");
+        return Response.success("좋아요를 눌렀습니다.");
+    }
+
+    // 좋아요 개수
+    @GetMapping("/{postId}/likes")
+    public Response<Long> countLike(@PathVariable("postId") Integer postId) {
+        Long counts = postService.getCountLike(postId);
+        log.info("좋아요 개수 반환 성공");
+        return Response.success(counts);
+    }
 }

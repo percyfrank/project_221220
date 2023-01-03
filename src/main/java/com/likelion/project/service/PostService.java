@@ -1,11 +1,13 @@
 package com.likelion.project.service;
 
 import com.likelion.project.domain.dto.post.*;
+import com.likelion.project.domain.entity.Like;
 import com.likelion.project.domain.entity.Post;
 import com.likelion.project.domain.entity.User;
 import com.likelion.project.exception.ErrorCode;
 import com.likelion.project.exception.AppException;
 import com.likelion.project.exception.AppException;
+import com.likelion.project.repository.LikeRepository;
 import com.likelion.project.repository.PostRepository;
 import com.likelion.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
 
 
     public PostCreateResponse createPost(PostCreateRequest request, String userName) {
@@ -91,5 +94,32 @@ public class PostService {
 
         Page<Post> posts = postRepository.findAllByUser(user, pageable);
         return posts.map(PostResponse::of);
+    }
+
+    public void like(Integer postId, String userName) {
+        // 로그인 유저 확인
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
+
+        // 포스트 존재 확인
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+
+        // 좋아요를 눌렀었는지 확인
+        likeRepository.findByUserAndPost(user, post)
+                .ifPresent(like -> {
+                    throw new AppException(ErrorCode.DUPLICATED_LIKE);
+                });
+
+        likeRepository.save(new Like(post, user));
+    }
+
+    @Transactional(readOnly = true)
+    public Long getCountLike(Integer postId) {
+        // 포스트 존재 확인
+        postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+
+        return likeRepository.countByPost_Id(postId);
     }
 }
