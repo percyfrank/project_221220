@@ -81,7 +81,7 @@ public class PostApiController {
             @PageableDefault(size = 20, sort = {"registeredAt"}, direction = Sort.Direction.DESC)
             Pageable pageable, Authentication authentication) {
         String userName = authentication.getName();
-        Page<PostResponse> posts = postService.findPostsByName(userName, pageable);
+        Page<PostResponse> posts = postService.findMyPost(userName, pageable);
         log.info("마이피드 조회 성공");
         return Response.success(posts);
     }
