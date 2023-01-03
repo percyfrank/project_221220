@@ -27,7 +27,8 @@ public class SwaggerConfig {
                 .build();
     }
 
-    private SecurityContext securityContext() {
+    // 여기서부터 Swagger에서 token 헤더에 넣는 설정정
+   private SecurityContext securityContext() {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth())
                 .build();
