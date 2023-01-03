@@ -19,10 +19,10 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
 
-        String username = customUser.username();
+        String userName = customUser.userName();
         String password = "password";
 
-        UserJoinRequest userJoinRequest = UserJoinRequest.builder().userName(username).password(password).build();
+        UserJoinRequest userJoinRequest = UserJoinRequest.builder().userName(userName).password(password).build();
         userService.join(userJoinRequest);
 
         final UsernamePasswordAuthenticationToken authenticationToken =
