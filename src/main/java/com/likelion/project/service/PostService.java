@@ -1,12 +1,11 @@
 package com.likelion.project.service;
 
 import com.likelion.project.domain.dto.post.*;
-import com.likelion.project.domain.entity.Like;
-import com.likelion.project.domain.entity.Post;
-import com.likelion.project.domain.entity.User;
+import com.likelion.project.domain.entity.*;
 import com.likelion.project.exception.ErrorCode;
 import com.likelion.project.exception.AppException;
 import com.likelion.project.exception.AppException;
+import com.likelion.project.repository.AlarmRepository;
 import com.likelion.project.repository.LikeRepository;
 import com.likelion.project.repository.PostRepository;
 import com.likelion.project.repository.UserRepository;
@@ -27,7 +26,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
-
+    private final AlarmRepository alarmRepository;
 
     public PostCreateResponse createPost(PostCreateRequest request, String userName) {
 
@@ -87,7 +86,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PostResponse> findPostsByName(String userName, Pageable pageable) {
+    public Page<PostResponse> findMyPost(String userName, Pageable pageable) {
         // 로그인 유저 확인
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
@@ -111,13 +110,23 @@ public class PostService {
                     throw new AppException(ErrorCode.DUPLICATED_LIKE);
                 });
 
+        // 좋아요 저장
         likeRepository.save(new Like(post, user));
+
+        // 좋아요 저장되면 알람도 저장
+        alarmRepository.save(Alarm.builder()
+                .user(post.getUser())
+                .alarmType(AlarmType.NEW_LIKE_ON_POST)
+                .fromUserId(user.getId())
+                .targetId(post.getId())
+                .text("new like!")
+                .build());
     }
 
     @Transactional(readOnly = true)
     public Long getCountLike(Integer postId) {
         // 포스트 존재 확인
-        postRepository.findById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
 
         return likeRepository.countByPost_Id(postId);

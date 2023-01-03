@@ -1,0 +1,31 @@
+package com.likelion.project.domain.entity;
+
+import lombok.*;
+
+import javax.persistence.*;
+
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class Alarm extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;              // 알람 받는 유저
+
+    @Enumerated(EnumType.STRING)
+    private AlarmType alarmType;    // NEW_COMMENT_ON_POST, NEW_LIKE_ON_POST
+
+    private Integer fromUserId;     // 알람(댓글,좋아요) 발생시킨 유저
+    private Integer targetId;       // 알람 발생된 게시글(댓글, 좋아요가 달린)
+
+    private String text;            // 알람 타입에 맞게  new comment!, new like! 입력
+}
