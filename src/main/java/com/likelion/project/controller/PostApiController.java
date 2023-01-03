@@ -74,4 +74,15 @@ public class PostApiController {
         log.info("포스트 삭제 성공");
         return Response.success(new PostDeleteResponse(id, "포스트 삭제 완료"));
     }
+
+    // 마이피드 조회
+    @GetMapping("/my")
+    public Response<Page<PostResponse>> myPostList(
+            @PageableDefault(size = 20, sort = {"registeredAt"}, direction = Sort.Direction.DESC)
+            Pageable pageable, Authentication authentication) {
+        String userName = authentication.getName();
+        Page<PostResponse> posts = postService.findPostsByName(userName, pageable);
+        log.info("마이피드 조회 성공");
+        return Response.success(posts);
+    }
 }

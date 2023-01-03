@@ -58,13 +58,11 @@ public class PostService {
     }
 
     public void update(Integer id, String userName, PostUpdateRequest request) {
-
         Post post = validatePost(id, userName);
         post.updatePost(request.getTitle(),request.getBody());
     }
 
     public void delete(Integer id, String userName) {
-
         Post post = validatePost(id, userName);
         postRepository.deleteById(post.getId());
     }
@@ -83,5 +81,15 @@ public class PostService {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
         return post;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostResponse> findPostsByName(String userName, Pageable pageable) {
+        // 로그인 유저 확인
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
+
+        Page<Post> posts = postRepository.findAllByUser(user, pageable);
+        return posts.map(PostResponse::of);
     }
 }
