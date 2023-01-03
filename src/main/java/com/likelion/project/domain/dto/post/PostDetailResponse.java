@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -16,17 +17,18 @@ public class PostDetailResponse {
     private String title;
     private String body;
     private String userName;
-    private LocalDateTime createdAt;
-    private LocalDateTime lastModifiedAt;
+    private String createdAt;
+    private String lastModifiedAt;
 
     public static PostDetailResponse of(Post post) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd a HH:mm:ss");
         return PostDetailResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .body(post.getBody())
                 .userName(post.getUser().getUserName())
-                .createdAt(post.getRegisteredAt())
-                .lastModifiedAt(post.getUpdatedAt())
+                .createdAt(simpleDateFormat.format(post.getRegisteredAt()))
+                .lastModifiedAt(simpleDateFormat.format(post.getUpdatedAt()))
                 .build();
     }
 }

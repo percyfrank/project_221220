@@ -4,6 +4,8 @@ import com.likelion.project.domain.dto.comment.CommentResponse;
 import lombok.*;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
@@ -29,8 +31,9 @@ public class Comment extends BaseEntity {
     private User user;
 
     public CommentResponse updateComment(String comment) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd a HH:mm:ss");
         this.comment = comment;
         return new CommentResponse(this.id, this.comment, this.user.getUserName(), this.post.getId(),
-                this.getUpdatedAt());
+                simpleDateFormat.format(this.getUpdatedAt()));
     }
 }
