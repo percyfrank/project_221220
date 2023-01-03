@@ -46,23 +46,22 @@ public class CommentApiController {
     }
 
     // 댓글 수정
-    @PutMapping("/posts/{postId}/comments/{id}")
+    @PutMapping("/posts/{postId}/comments/{commentId}")
     public Response<CommentResponse> updateComment(
             @PathVariable("postId") Integer postId,
-            @PathVariable("id") Integer commentId,
+            @PathVariable("commentId") Integer commentId,
             @RequestBody CommentRequest request, @ApiIgnore Authentication authentication) {
 
-        String userName = authentication.getName();
-        CommentResponse updatedComment = commentService.update(postId, commentId, request, userName);
+        CommentResponse updatedComment = commentService.update(postId, commentId, request, authentication.getName());
         log.info("댓글 수정 성공");
         return Response.success(updatedComment);
 
     }
 
     // 댓글 삭제
-    @DeleteMapping("/posts/{postsId}/comments/{id}")
+    @DeleteMapping("/posts/{postsId}/comments/{commentId}")
     public Response<CommentDeleteResponse> deleteComment(
-            @PathVariable("postsId") Integer postId, @PathVariable("id") Integer commentId,
+            @PathVariable("postsId") Integer postId, @PathVariable("commentId") Integer commentId,
             Authentication authentication) {
 
         String userName = authentication.getName();
