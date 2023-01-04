@@ -1,5 +1,6 @@
 package com.likelion.project.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,11 +24,14 @@ public abstract class BaseEntity {
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
-    private Timestamp registeredAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd a HH:mm:ss")
+    private LocalDateTime registeredAt;
 
     @LastModifiedDate
     @Column(nullable = false)
-    private Timestamp updatedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd a HH:mm:ss")
+    private LocalDateTime updatedAt;
 
-    private Timestamp deletedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd a HH:mm:ss")
+    private LocalDateTime deletedAt;
 }

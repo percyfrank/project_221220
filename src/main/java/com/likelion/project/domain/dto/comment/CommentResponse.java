@@ -1,5 +1,6 @@
 package com.likelion.project.domain.dto.comment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.likelion.project.domain.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,16 +18,19 @@ public class CommentResponse {
     private String comment;
     private String userName;
     private Integer postId;
-    private String createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd a HH:mm:ss")
+    private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd a HH:mm:ss")
+    private LocalDateTime lastModifiedAt;
 
     public static CommentResponse of(Comment comment) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd a HH:mm:ss");
         return CommentResponse.builder()
                 .id(comment.getId())
                 .comment(comment.getComment())
                 .userName(comment.getUser().getUserName())
                 .postId(comment.getPost().getId())
-                .createdAt(simpleDateFormat.format(comment.getRegisteredAt()))
+                .createdAt(comment.getRegisteredAt())
+                .lastModifiedAt(comment.getUpdatedAt())
                 .build();
     }
 }

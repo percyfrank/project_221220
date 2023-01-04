@@ -1,5 +1,6 @@
 package com.likelion.project.domain.dto.alarm;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.likelion.project.domain.entity.Alarm;
 import com.likelion.project.domain.entity.AlarmType;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -17,17 +19,17 @@ public class AlarmResponse {
     private Integer fromUserId; //알림을 발생시킨 user
     private Integer targetId;   //알림이 발생된 post
     private String text;
-    private String createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd a HH:mm:ss")
+    private LocalDateTime createdAt;
 
     public static AlarmResponse of(Alarm alarm) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd a HH:mm:ss");
         return AlarmResponse.builder().
                 id(alarm.getId())
                 .alarmType(alarm.getAlarmType())
                 .fromUserId(alarm.getFromUserId())
                 .targetId(alarm.getTargetId())
                 .text(alarm.getText())
-                .createdAt(simpleDateFormat.format(alarm.getRegisteredAt()))
+                .createdAt(alarm.getRegisteredAt())
                 .build();
     }
 }

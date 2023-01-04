@@ -39,9 +39,8 @@ public class Comment extends BaseEntity {
     private User user;
 
     public CommentResponse updateComment(String comment) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd a HH:mm:ss");
         this.comment = comment;
         return new CommentResponse(this.id, this.comment, this.user.getUserName(), this.post.getId(),
-                simpleDateFormat.format(this.getUpdatedAt()));
+                this.getRegisteredAt(),this.getUpdatedAt());
     }
 }
