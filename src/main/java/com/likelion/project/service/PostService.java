@@ -95,7 +95,7 @@ public class PostService {
         return posts.map(PostResponse::of);
     }
 
-    public void like(Integer postId, String userName) {
+    public void createLike(Integer postId, String userName) {
         // 로그인 유저 확인
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
@@ -114,19 +114,21 @@ public class PostService {
         likeRepository.save(new Like(post, user));
 
         // 좋아요 저장되면 알람도 저장
-        alarmRepository.save(Alarm.builder()
-                .user(post.getUser())
-                .alarmType(AlarmType.NEW_LIKE_ON_POST)
-                .fromUserId(user.getId())
-                .targetId(post.getId())
-                .text("new like!")
-                .build());
+        if(!post.getUser().getUserName().equals(userName)) {
+            alarmRepository.save(Alarm.builder()
+                    .user(post.getUser())
+                    .alarmType(AlarmType.NEW_LIKE_ON_POST)
+                    .fromUserId(user.getId())
+                    .targetId(post.getId())
+                    .text("new like!")
+                    .build());
+        }
     }
 
     @Transactional(readOnly = true)
     public Long getCountLike(Integer postId) {
         // 포스트 존재 확인
-        Post post = postRepository.findById(postId)
+        postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
 
         return likeRepository.countByPost_Id(postId);

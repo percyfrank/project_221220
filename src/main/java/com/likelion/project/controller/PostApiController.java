@@ -88,10 +88,10 @@ public class PostApiController {
 
     // 좋아요 누르기
     @PostMapping("/{postId}/likes")
-    public Response<String> updateLike(@PathVariable("postId") Integer postId,
+    public Response<String> addLike(@PathVariable("postId") Integer postId,
                                              Authentication authentication) {
 
-        postService.like(postId, authentication.getName());
+        postService.createLike(postId, authentication.getName());
         log.info("좋아요 누르기 성공");
         return Response.success("좋아요를 눌렀습니다.");
     }

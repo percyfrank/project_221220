@@ -41,19 +41,23 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
 
+        // 댓글 DTO로 변환
         Comment comment = Comment.builder().comment(request.getComment()).user(user).post(post).build();
 
         // 댓글 저장
         Comment savedComment = commentRepository.save(comment);
 
-        // 댓글 달리면 알림도 저장
-        alarmRepository.save(Alarm.builder()
-                .user(post.getUser())
-                .alarmType(AlarmType.NEW_COMMENT_ON_POST)
-                .fromUserId(user.getId())
-                .targetId(post.getId())
-                .text("new comment!")
-                .build());
+        // 자기 자신의 게시물인지 확인
+        if(!post.getUser().getUserName().equals(userName)) {
+            // 댓글 달리면 알림도 저장
+            alarmRepository.save(Alarm.builder()
+                    .user(post.getUser())
+                    .alarmType(AlarmType.NEW_COMMENT_ON_POST)
+                    .fromUserId(user.getId())
+                    .targetId(post.getId())
+                    .text("new comment!")
+                    .build());
+        }
 
         return CommentResponse.of(savedComment);
     }
