@@ -100,6 +100,46 @@ class PostApiControllerTest {
             assertThat(pageable.getPageSize()).isEqualTo(20);
             assertThat(pageable.getSort()).isEqualTo(Sort.by("id").descending());
         }
+
+        @Test
+        @DisplayName("마이 피드 조회 성공")
+        public void mypost_success() throws Exception {
+
+            String token = JwtTokenUtil.createToken("userName", secretKey, 1000 * 60 * 60L);
+
+            PageRequest pageable = PageRequest.of(0, 20,Sort.Direction.DESC,"registeredAt");
+
+            mockMvc.perform(get("/api/v1/posts/my")
+                            .header(HttpHeaders.AUTHORIZATION,"Bearer " + token)
+                            .param("page", "0")
+                            .param("size", "20")
+                            .param("sort", "registeredAt")
+                            .param("direction","Sort.Direction.DESC"))
+                    .andExpect(status().isOk())
+                    .andDo(print());
+
+            assertThat(pageable.getPageNumber()).isEqualTo(0);
+            assertThat(pageable.getPageSize()).isEqualTo(20);
+            assertThat(pageable.getSort()).isEqualTo(Sort.by("registeredAt").descending());
+        }
+
+        @Test
+        @DisplayName("마이피드 조회 실패(1) - 로그인 하지 않은 경우")
+        public void mypost_fail1() throws Exception {
+
+            mockMvc.perform(get("/api/v1/posts/my")
+                            .param("page", "0")
+                            .param("size", "20")
+                            .param("sort", "registeredAt")
+                            .param("direction", "Sort.Direction.DESC"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.resultCode").exists())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result.errorCode").value("TOKEN_NOT_FOUND"))
+                    .andExpect(jsonPath("$.result.message").value("토큰이 존재하지 않습니다."))
+                    .andDo(print());
+        }
     }
 
     @Nested
