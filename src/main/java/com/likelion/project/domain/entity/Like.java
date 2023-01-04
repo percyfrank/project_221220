@@ -1,6 +1,10 @@
 package com.likelion.project.domain.entity;
 
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -12,6 +16,8 @@ import javax.persistence.*;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "likes")
+@Where(clause = "deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE likes SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 public class Like extends BaseEntity {
 
     @Id
@@ -20,11 +26,13 @@ public class Like extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
+//    @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+//    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     public Like(Post post, User user) {

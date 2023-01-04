@@ -2,6 +2,10 @@ package com.likelion.project.domain.entity;
 
 import com.likelion.project.domain.dto.comment.CommentResponse;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
@@ -14,6 +18,8 @@ import java.time.LocalDateTime;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@Where(clause = "deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE comment SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 public class Comment extends BaseEntity {
 
     @Id
@@ -24,10 +30,12 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
+//    @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+//    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     public CommentResponse updateComment(String comment) {

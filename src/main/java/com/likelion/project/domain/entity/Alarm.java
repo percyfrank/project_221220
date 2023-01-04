@@ -1,6 +1,10 @@
 package com.likelion.project.domain.entity;
 
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -11,6 +15,8 @@ import javax.persistence.*;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@Where(clause = "deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE alarm SET deleted_at = CURRENT_TIMESTAMP where id = ?")
 public class Alarm extends BaseEntity {
 
     @Id
@@ -19,6 +25,7 @@ public class Alarm extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+//    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;              // 알람 받는 유저
 
     @Enumerated(EnumType.STRING)
