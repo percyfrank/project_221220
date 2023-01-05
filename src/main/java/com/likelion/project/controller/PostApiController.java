@@ -38,7 +38,7 @@ public class PostApiController {
     // 포스트 리스트
     @GetMapping("")
     public Response<Page<PostResponse>> postList(
-            @PageableDefault(size = 20, sort = {"id"}, direction = Sort.Direction.DESC)
+            @PageableDefault(size = 20, sort = {"registeredAt"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         Page<PostResponse> allPost = postService.findAllPost(pageable);
         log.info("포스트 리스트 조회 성공");
