@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 @Slf4j
 public class CommentApiController {
@@ -24,51 +24,42 @@ public class CommentApiController {
     private final CommentService commentService;
 
     // 특정 포스트의 댓글 전체 조회
-    @GetMapping("/posts/{postId}/comments")
+    @GetMapping("/{postId}/comments")
     public Response<Page<CommentResponse>> commentList(
-            @PathVariable("postId") Integer id,
+            @PathVariable("postId") Integer postId,
             @PageableDefault(size = 10, sort = {"registeredAt"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
-        Page<CommentResponse> allComments = commentService.findAllComments(id, pageable);
+        Page<CommentResponse> allComments = commentService.findAllComments(postId, pageable);
         log.info("댓글 조회 성공");
         return Response.success(allComments);
     }
 
     // 댓글 작성
-    @PostMapping("/posts/{postsId}/comments")
-    public Response<CommentResponse> addComment(
-            @PathVariable("postsId") Integer id,
+    @PostMapping("/{postId}/comments")
+    public Response<CommentResponse> addComment(@PathVariable("postId") Integer postId,
             @RequestBody CommentRequest request, @ApiIgnore Authentication authentication) {
-        String userName = authentication.getName();
-        CommentResponse comment = commentService.createComment(id, request, userName);
+        CommentResponse comment = commentService.create(postId, request, authentication);
         log.info("댓글 작성 성공");
         return Response.success(comment);
     }
 
     // 댓글 수정
-    @PutMapping("/posts/{postId}/comments/{commentId}")
-    public Response<CommentResponse> updateComment(
-            @PathVariable("postId") Integer postId,
-            @PathVariable("commentId") Integer commentId,
+    @PutMapping("/{postId}/comments/{commentId}")
+    public Response<CommentResponse> updateComment(@PathVariable("postId") Integer postId, @PathVariable("commentId") Integer commentId,
             @RequestBody CommentRequest request, @ApiIgnore Authentication authentication) {
-
-        CommentResponse updatedComment = commentService.update(postId, commentId, request, authentication.getName());
+        CommentResponse updatedComment = commentService.update(postId, commentId, request, authentication);
         log.info("댓글 수정 성공");
         return Response.success(updatedComment);
 
     }
 
     // 댓글 삭제
-    @DeleteMapping("/posts/{postsId}/comments/{commentId}")
+    @DeleteMapping("/{postId}/comments/{commentId}")
     public Response<CommentDeleteResponse> deleteComment(
-            @PathVariable("postsId") Integer postId, @PathVariable("commentId") Integer commentId,
+            @PathVariable("postId") Integer postId, @PathVariable("commentId") Integer commentId,
             Authentication authentication) {
-
-        String userName = authentication.getName();
-        commentService.delete(postId, commentId, userName);
+        commentService.delete(postId, commentId, authentication);
         log.info("댓글 삭제 성공");
         return Response.success(new CommentDeleteResponse(commentId, "댓글 삭제 완료"));
-
     }
-
 }

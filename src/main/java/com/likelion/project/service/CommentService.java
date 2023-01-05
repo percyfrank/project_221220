@@ -12,6 +12,7 @@ import com.likelion.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,10 @@ public class CommentService {
         return comments.map(CommentResponse::of);
     }
 
-    public CommentResponse createComment(Integer postId, CommentRequest request, String userName) {
+    public CommentResponse create(Integer postId, CommentRequest request, Authentication authentication) {
+
+        // 유저 이름 추출
+        String userName = authentication.getName();
 
         // 로그인된 유저 확인
         User user = userRepository.findByUserName(userName)
@@ -63,18 +67,22 @@ public class CommentService {
     }
 
     public CommentResponse update(Integer postId, Integer commentId,
-                                  CommentRequest request, String userName) {
+                                  CommentRequest request, Authentication authentication) {
 
+        String userName = authentication.getName();
+        // 검증
         Comment comment = validateComment(postId, commentId, userName);
         CommentResponse updatedComment = comment.updateComment(request.getComment());
         return updatedComment;
     }
 
-    public void delete(Integer postId, Integer commentId, String userName) {
+    public void delete(Integer postId, Integer commentId, Authentication authentication) {
+        String userName = authentication.getName();
+        // 검증
         validateComment(postId, commentId, userName);
         commentRepository.deleteById(commentId);
-
     }
+
     private Comment validateComment(Integer postId, Integer commentId, String userName) {
         // 로그인된 유저 확인
         userRepository.findByUserName(userName)
