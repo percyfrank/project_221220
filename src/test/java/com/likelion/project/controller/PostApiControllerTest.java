@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likelion.project.annotation.WebMvcTestSecurity;
 import com.likelion.project.annotation.WithMockCustomUser;
 import com.likelion.project.configuration.SecurityConfig;
+import com.likelion.project.domain.dto.comment.CommentResponse;
 import com.likelion.project.jwt.JwtTokenExceptionFilter;
 import com.likelion.project.jwt.JwtTokenFilter;
 import com.likelion.project.jwt.JwtTokenUtil;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +29,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.likelion.project.exception.ErrorCode.INVALID_TOKEN;
 import static org.assertj.core.api.Assertions.*;
@@ -57,6 +62,11 @@ class PostApiControllerTest {
 
     private final PostCreateRequest postCreateRequest = new PostCreateRequest("제목", "내용");
     private final PostCreateResponse postCreateResponse = new PostCreateResponse(1, "포스트 등록 완료");
+    private final PostResponse postResponse1 = new PostResponse(1, "title", "body", "user1", LocalDateTime.now(), LocalDateTime.now());
+    private final PostResponse postResponse2 = new PostResponse(2, "title", "body", "user2", LocalDateTime.now(), LocalDateTime.now());
+    private final PageImpl<PostResponse> user1page = new PageImpl<>(List.of(postResponse1));
+    private final PageImpl<PostResponse> page = new PageImpl<>(List.of(postResponse1, postResponse2));
+    private final PageRequest pageable = PageRequest.of(0, 20,Sort.Direction.DESC,"registeredAt");
     private PostUpdateRequest postUpdateRequest;
     private PostDeleteRequest postDeleteRequest;
     private final PostDetailResponse postDetailResponse = PostDetailResponse.builder().id(1).title("title").body("body").userName("userName").build();
@@ -87,58 +97,64 @@ class PostApiControllerTest {
         @DisplayName("포스트 리스트 조회 성공 - 0번이 1번보다 날짜가 최신")
         public void postlist_success() throws Exception {
 
-            PageRequest pageable = PageRequest.of(0, 20,Sort.Direction.DESC,"id");
+            given(postService.findAllPost(pageable)).willReturn(page);
 
-            mockMvc.perform(get("/api/v1/posts")
-                            .param("page", "0")
-                            .param("size", "20")
-                            .param("sort", "id")
-                            .param("direction","Sort.Direction.DESC"))
-                    .andExpect(status().isOk());
+            mockMvc.perform(get("/api/v1/posts"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                    .andExpect(jsonPath("$.result.content").isArray())
+                    .andExpect(jsonPath("$['result']['content'][0]").exists())
+                    .andExpect(jsonPath("$['result']['content'][1]").exists())
+                    .andExpect(jsonPath("$.result.pageable").exists())
+                    .andExpect(jsonPath("$.result.size").value(2))
+                    .andExpect(jsonPath("$.result.sort").exists())
+                    .andDo(print());
 
             assertThat(pageable.getPageNumber()).isEqualTo(0);
             assertThat(pageable.getPageSize()).isEqualTo(20);
-            assertThat(pageable.getSort()).isEqualTo(Sort.by("id").descending());
+            assertThat(pageable.getSort()).isEqualTo(Sort.by("registeredAt").descending());
+
+            then(postService).should(times(1)).findAllPost(pageable);
         }
 
         @Test
         @DisplayName("마이 피드 조회 성공")
         public void mypost_success() throws Exception {
 
-            String token = JwtTokenUtil.createToken("userName", secretKey, 1000 * 60 * 60L);
+            String token = JwtTokenUtil.createToken("user1", secretKey, 1000 * 60 * 60L);
 
-            PageRequest pageable = PageRequest.of(0, 20,Sort.Direction.DESC,"registeredAt");
+            given(postService.findMyPost(postResponse1.getUserName(), pageable)).willReturn(user1page);
 
             mockMvc.perform(get("/api/v1/posts/my")
-                            .header(HttpHeaders.AUTHORIZATION,"Bearer " + token)
-                            .param("page", "0")
-                            .param("size", "20")
-                            .param("sort", "registeredAt")
-                            .param("direction","Sort.Direction.DESC"))
+                            .header(HttpHeaders.AUTHORIZATION,"Bearer " + token))
                     .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                    .andExpect(jsonPath("$.result.content").isArray())
+                    .andExpect(jsonPath("$['result']['content'][0]").exists())
+                    .andExpect(jsonPath("$.result.pageable").exists())
+                    .andExpect(jsonPath("$.result.size").value(1))
+                    .andExpect(jsonPath("$.result.sort").exists())
                     .andDo(print());
 
             assertThat(pageable.getPageNumber()).isEqualTo(0);
             assertThat(pageable.getPageSize()).isEqualTo(20);
             assertThat(pageable.getSort()).isEqualTo(Sort.by("registeredAt").descending());
+
+            then(postService).should(times(1)).findMyPost(postResponse1.getUserName(),pageable);
         }
 
         @Test
         @DisplayName("마이피드 조회 실패(1) - 로그인 하지 않은 경우")
         public void mypost_fail1() throws Exception {
 
-            mockMvc.perform(get("/api/v1/posts/my")
-                            .param("page", "0")
-                            .param("size", "20")
-                            .param("sort", "registeredAt")
-                            .param("direction", "Sort.Direction.DESC"))
+            mockMvc.perform(get("/api/v1/posts/my"))
                     .andExpect(status().isUnauthorized())
-                    .andExpect(jsonPath("$.resultCode").exists())
                     .andExpect(jsonPath("$.resultCode").value("ERROR"))
-                    .andExpect(jsonPath("$.result").exists())
                     .andExpect(jsonPath("$.result.errorCode").value("TOKEN_NOT_FOUND"))
                     .andExpect(jsonPath("$.result.message").value("토큰이 존재하지 않습니다."))
                     .andDo(print());
+
+            then(postService).should(never()).findMyPost(any(),any());
         }
     }
 
@@ -227,6 +243,64 @@ class PostApiControllerTest {
                     .andExpect(jsonPath("$.result.errorCode").value("INVALID_TOKEN"))
                     .andExpect(jsonPath("$.result.message").value("잘못된 토큰입니다."))
                     .andDo(print());
+        }
+
+        @Test
+        @DisplayName("좋아요 누르기 성공")
+        public void like_create_success() throws Exception {
+
+            Integer postId = 1;
+            String token = JwtTokenUtil.createToken("userName", secretKey, 1000 * 60 * 60L);
+
+            willDoNothing().given(postService).createLike(any(), any());
+
+            mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
+                            .header(HttpHeaders.AUTHORIZATION,"Bearer " + token)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                    .andExpect(jsonPath("$.result").value("좋아요를 눌렀습니다."))
+                    .andDo(print());
+
+            then(postService).should(times(1)).createLike(any(),any());
+        }
+
+        @Test
+        @DisplayName("좋아요 누르기 실패(1) - 로그인 하지 않은 경우")
+        public void like_create_fail1() throws Exception {
+
+            Integer postId = 1;
+
+            mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result.errorCode").value("TOKEN_NOT_FOUND"))
+                    .andExpect(jsonPath("$.result.message").value("토큰이 존재하지 않습니다."))
+                    .andDo(print());
+
+            then(postService).should(never()).createLike(any(),any());
+        }
+
+        @Test
+        @DisplayName("좋아요 누르기 실패(2) - 해당 Post가 없는 경우")
+        public void like_create_fail2() throws Exception {
+
+            Integer postId = 1;
+            String token = JwtTokenUtil.createToken("userName", secretKey, 1000 * 60 * 60L);
+
+            willThrow(new AppException(ErrorCode.POST_NOT_FOUND)).given(postService).createLike(any(), any());
+
+            mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
+                            .header(HttpHeaders.AUTHORIZATION,"Bearer " + token)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result.errorCode").value("POST_NOT_FOUND"))
+                    .andExpect(jsonPath("$.result.message").value("해당 포스트가 없습니다."))
+                    .andDo(print());
+
+            then(postService).should(times(1)).createLike(any(),any());
         }
     }
 
