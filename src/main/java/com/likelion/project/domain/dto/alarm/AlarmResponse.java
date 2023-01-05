@@ -6,6 +6,7 @@ import com.likelion.project.domain.entity.AlarmType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -23,8 +24,8 @@ public class AlarmResponse {
     private LocalDateTime createdAt;
 
     public static AlarmResponse of(Alarm alarm) {
-        return AlarmResponse.builder().
-                id(alarm.getId())
+        return AlarmResponse.builder()
+                .id(alarm.getId())
                 .alarmType(alarm.getAlarmType())
                 .fromUserId(alarm.getFromUserId())
                 .targetId(alarm.getTargetId())

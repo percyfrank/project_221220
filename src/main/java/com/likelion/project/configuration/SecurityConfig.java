@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .and()
                     .authorizeRequests()
                     .antMatchers("/api/v1/users/login","/api/v1/users/join", "/swagger-ui").permitAll() // join, login 은 언제나 가능
-                    .antMatchers(HttpMethod.GET,"/api/v1/posts/my").authenticated()
+                    .antMatchers(HttpMethod.GET,"/api/v1/posts/my","/api/v1/alarms").authenticated()
                     .antMatchers(HttpMethod.GET,"/api/v1/posts/**").permitAll()   // 모든 get 요청 허용
                     .antMatchers(HttpMethod.POST,"/api/v1/**").authenticated()  // 순서대로 적용이 되기 때문에 join, login 다음에 써주기
                     .antMatchers(HttpMethod.PUT, "/api/v1/**").authenticated()
