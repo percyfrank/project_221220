@@ -40,5 +40,13 @@ public class User extends BaseEntity {
             throw new AppException(ErrorCode.INVALID_VALUE);
         }
     }
+
+    public static User createUser(String userName, String password) {
+        return User.builder()
+                .userName(userName)
+                .password(password)
+                .role(UserRole.ROLE_USER)
+                .build();
+    }
 }
 

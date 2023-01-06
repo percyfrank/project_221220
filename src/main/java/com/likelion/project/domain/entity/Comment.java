@@ -29,14 +29,22 @@ public class Comment extends BaseEntity {
     private String comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
 //    @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-    private User user;
+    public static Comment createComment(String comment,User user,Post post) {
+        return Comment.builder()
+                .comment(comment)
+                .user(user)
+                .post(post)
+                .build();
+    }
 
     public CommentResponse updateComment(String comment) {
         this.comment = comment;

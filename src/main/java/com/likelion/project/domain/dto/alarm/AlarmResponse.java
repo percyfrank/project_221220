@@ -29,7 +29,7 @@ public class AlarmResponse {
                 .alarmType(alarm.getAlarmType())
                 .fromUserId(alarm.getFromUserId())
                 .targetId(alarm.getTargetId())
-                .text(alarm.getText())
+                .text(alarm.getAlarmType().getText())
                 .createdAt(alarm.getRegisteredAt())
                 .build();
     }

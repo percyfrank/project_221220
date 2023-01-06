@@ -30,11 +30,10 @@ public class UserApiController {
     }
 
     @PostMapping("/{userId}/role/change")
-    public Response<UserRoleResponse> changerole(@PathVariable("userId") Integer id,
+    public Response<UserRoleResponse> roleChange(@PathVariable("userId") Integer id,
                                                  @RequestBody UserRoleRequest userRoleRequest,
                                                  Authentication authentication) {
-        String userName = authentication.getName();
-        UserRoleResponse response = userService.changerole(id, userRoleRequest, userName);
+        UserRoleResponse response = userService.changeRole(id, userRoleRequest, authentication.getName());
         log.info("유저 권한 변경 성공");
         return Response.success(response);
     }

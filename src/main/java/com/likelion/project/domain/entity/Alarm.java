@@ -34,5 +34,14 @@ public class Alarm extends BaseEntity {
     private Integer fromUserId;     // 알람(댓글,좋아요) 발생시킨 유저
     private Integer targetId;       // 알람 발생된 게시글(댓글, 좋아요가 달린)
 
-    private String text;            // 알람 타입에 맞게  new comment!, new like! 입력
+//    private String text;            // 알람 타입에 맞게  new comment!, new like! 입력
+
+    public static Alarm createAlarm(User user,Post post,AlarmType alarmType) {
+        return Alarm.builder()
+                .user(post.getUser())
+                .alarmType(alarmType)
+                .fromUserId(user.getId())
+                .targetId(post.getId())
+                .build();
+    }
 }

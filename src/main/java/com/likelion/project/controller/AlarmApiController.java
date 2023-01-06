@@ -27,8 +27,7 @@ public class AlarmApiController {
     public Response<Page<AlarmResponse>> alarmList(Authentication authentication,
              @PageableDefault(size = 20, sort = {"registeredAt"}, direction = Sort.Direction.DESC)
              Pageable pageable) {
-        Page<AlarmResponse> alarms = alarmService.getAlarmList(authentication.getName(), pageable);
         log.info("알림 리스트 조회 성공");
-        return Response.success(alarms);
+        return Response.success(alarmService.getAlarmList(authentication.getName(), pageable));
     }
 }

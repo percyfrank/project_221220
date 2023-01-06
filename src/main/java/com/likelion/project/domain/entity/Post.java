@@ -31,8 +31,12 @@ public class Post extends BaseEntity {
 //    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    public void updatePost(String title, String body) {
-        this.title = title;
-        this.body = body;
+    public static Post createPost(String title,String body,User user) {
+        return Post.builder().title(title).body(body).user(user).build();
+    }
+
+    public void updatePost(String requestTitle, String requestBody) {
+        this.title = requestTitle;
+        this.body = requestBody;
     }
 }

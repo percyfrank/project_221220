@@ -29,7 +29,6 @@ public class Like extends BaseEntity {
 //    @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
 //    @OnDelete(action = OnDeleteAction.CASCADE)
@@ -38,5 +37,9 @@ public class Like extends BaseEntity {
     public Like(Post post, User user) {
         this.post = post;
         this.user = user;
+    }
+
+    public static Like createLike(Post post, User user) {
+        return Like.builder().post(post).user(user).build();
     }
 }

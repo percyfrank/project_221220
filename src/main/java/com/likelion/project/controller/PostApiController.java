@@ -1,7 +1,6 @@
 package com.likelion.project.controller;
 
 import com.likelion.project.domain.dto.post.*;
-import com.likelion.project.domain.entity.Post;
 import com.likelion.project.exception.Response;
 import com.likelion.project.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -29,10 +26,9 @@ public class PostApiController {
     // 포스트 생성
     @PostMapping("")
     public Response<PostCreateResponse> addPost(@RequestBody PostCreateRequest request, @ApiIgnore Authentication authentication) {
-        String userName = authentication.getName();
-        PostCreateResponse post = postService.createPost(request, userName);
+        PostCreateResponse createdPost = postService.createPost(request, authentication.getName());
         log.info("포스트 생성 성공");
-        return Response.success(post);
+        return Response.success(createdPost);
     }
 
     // 포스트 리스트
@@ -49,9 +45,9 @@ public class PostApiController {
     // 포스트 상세
     @GetMapping("/{postsId}")
     public Response<PostDetailResponse> postDetail(@PathVariable("postsId") Integer id) {
-        PostDetailResponse post = postService.findPost(id);
+        PostDetailResponse postDetail = postService.findPost(id);
         log.info("포스트 상세 조회 성공");
-        return Response.success(post);
+        return Response.success(postDetail);
     }
 
     // 포스트 수정
@@ -59,20 +55,18 @@ public class PostApiController {
     public Response<PostUpdateResponse> updatePost(@PathVariable("postsId") Integer id,
                                                    @RequestBody @Valid PostUpdateRequest request,
                                                    Authentication authentication) {
-        String userName = authentication.getName();
-        postService.update(id, userName, request);
+        PostUpdateResponse updatedPost = postService.update(id, request, authentication.getName());
         log.info("포스트 수정 성공");
-        return Response.success(new PostUpdateResponse(id, "포스트 수정 완료"));
+        return Response.success(updatedPost);
     }
 
     // 포스트 삭제
     @DeleteMapping("/{postsId}")
     public Response<PostDeleteResponse> deletePost(@PathVariable("postsId") Integer id,
                                                    Authentication authentication) {
-        String userName = authentication.getName();
-        postService.delete(id, userName);
+        PostDeleteResponse deletedPost = postService.delete(id, authentication.getName());
         log.info("포스트 삭제 성공");
-        return Response.success(new PostDeleteResponse(id, "포스트 삭제 완료"));
+        return Response.success(deletedPost);
     }
 
     // 마이피드 조회
@@ -80,8 +74,7 @@ public class PostApiController {
     public Response<Page<PostResponse>> myPostList(
             @PageableDefault(size = 20, sort = {"registeredAt"}, direction = Sort.Direction.DESC)
             Pageable pageable, Authentication authentication) {
-        String userName = authentication.getName();
-        Page<PostResponse> posts = postService.findMyPost(userName, pageable);
+        Page<PostResponse> posts = postService.findMyPost(authentication.getName(), pageable);
         log.info("마이피드 조회 성공");
         return Response.success(posts);
     }
@@ -90,7 +83,6 @@ public class PostApiController {
     @PostMapping("/{postId}/likes")
     public Response<String> addLike(@PathVariable("postId") Integer postId,
                                              Authentication authentication) {
-
         postService.createLike(postId, authentication.getName());
         log.info("좋아요 누르기 성공");
         return Response.success("좋아요를 눌렀습니다.");

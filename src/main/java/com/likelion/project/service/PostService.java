@@ -34,11 +34,7 @@ public class PostService {
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_PERMISSION));
 
-        Post post = Post.builder()
-                .title(request.getTitle())
-                .body(request.getBody())
-                .user(user)
-                .build();
+        Post post = Post.createPost(request.getTitle(), request.getBody(), user);
 
         Post savedPost = postRepository.save(post);
         return PostCreateResponse.of(savedPost);
@@ -59,14 +55,16 @@ public class PostService {
         return PostDetailResponse.of(post);
     }
 
-    public void update(Integer id, String userName, PostUpdateRequest request) {
+    public PostUpdateResponse update(Integer id, PostUpdateRequest request ,String userName) {
         Post post = validatePost(id, userName);
         post.updatePost(request.getTitle(),request.getBody());
+        return PostUpdateResponse.of(id);
     }
 
-    public void delete(Integer id, String userName) {
+    public PostDeleteResponse delete(Integer id, String userName) {
         Post post = validatePost(id, userName);
         postRepository.deleteById(post.getId());
+        return PostDeleteResponse.of(id);
     }
 
     private Post validatePost(Integer id, String userName) {
@@ -111,17 +109,11 @@ public class PostService {
                 });
 
         // 좋아요 저장
-        likeRepository.save(new Like(post, user));
+        likeRepository.save(Like.createLike(post,user));
 
         // 좋아요 저장되면 알람도 저장
         if(!post.getUser().getUserName().equals(userName)) {
-            alarmRepository.save(Alarm.builder()
-                    .user(post.getUser())
-                    .alarmType(AlarmType.NEW_LIKE_ON_POST)
-                    .fromUserId(user.getId())
-                    .targetId(post.getId())
-                    .text("new like!")
-                    .build());
+            alarmRepository.save(Alarm.createAlarm(user, post, AlarmType.NEW_LIKE_ON_POST));
         }
     }
 

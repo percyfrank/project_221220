@@ -33,12 +33,10 @@ public class UserService {
 
         // 회원 저장
         User savedUser = userRepository.save(
-                userJoinRequest.toEntity(encoder.encode(userJoinRequest.getPassword())));
+                User.createUser(userJoinRequest.getUserName(),
+                        encoder.encode(userJoinRequest.getPassword())));
 
-        return UserJoinResponse.builder()
-                .userId(savedUser.getId())
-                .userName(savedUser.getUserName())
-                .build();
+        return UserJoinResponse.of(savedUser);
     }
 
     public UserLoginResponse login(String userName, String password) {
@@ -54,7 +52,7 @@ public class UserService {
         return new UserLoginResponse(JwtTokenUtil.createToken(userName, secretKey, expireTimeMs));
     }
 
-    public UserRoleResponse changerole(Integer id, UserRoleRequest userRoleRequest, String userName) {
+    public UserRoleResponse changeRole(Integer id, UserRoleRequest userRoleRequest, String userName) {
 
         // 권한을 변경하고자 하는(@PathVariable의) 사용자가 있는지 확인
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));

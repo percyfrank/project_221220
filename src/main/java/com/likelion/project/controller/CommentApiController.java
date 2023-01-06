@@ -38,7 +38,7 @@ public class CommentApiController {
     @PostMapping("/{postId}/comments")
     public Response<CommentResponse> addComment(@PathVariable("postId") Integer postId,
             @RequestBody CommentRequest request, @ApiIgnore Authentication authentication) {
-        CommentResponse comment = commentService.create(postId, request, authentication);
+        CommentResponse comment = commentService.create(postId, request, authentication.getName());
         log.info("댓글 작성 성공");
         return Response.success(comment);
     }
@@ -47,7 +47,7 @@ public class CommentApiController {
     @PutMapping("/{postId}/comments/{commentId}")
     public Response<CommentResponse> updateComment(@PathVariable("postId") Integer postId, @PathVariable("commentId") Integer commentId,
             @RequestBody CommentRequest request, @ApiIgnore Authentication authentication) {
-        CommentResponse updatedComment = commentService.update(postId, commentId, request, authentication);
+        CommentResponse updatedComment = commentService.update(postId, commentId, request, authentication.getName());
         log.info("댓글 수정 성공");
         return Response.success(updatedComment);
 
@@ -58,8 +58,8 @@ public class CommentApiController {
     public Response<CommentDeleteResponse> deleteComment(
             @PathVariable("postId") Integer postId, @PathVariable("commentId") Integer commentId,
             Authentication authentication) {
-        commentService.delete(postId, commentId, authentication);
+        CommentDeleteResponse deletedComment = commentService.delete(postId, commentId, authentication.getName());
         log.info("댓글 삭제 성공");
-        return Response.success(new CommentDeleteResponse(commentId, "댓글 삭제 완료"));
+        return Response.success(deletedComment);
     }
 }

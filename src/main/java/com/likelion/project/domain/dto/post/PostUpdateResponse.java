@@ -13,10 +13,10 @@ public class PostUpdateResponse {
     private Integer postId;
     private String message;
 
-//    public static PostUpdateResponse of(Post post) {
-//        return PostUpdateResponse.builder()
-//                .postId(post.getId())
-//                .message("포스트 수정 완료")
-//                .build();
-//    }
+    public static PostUpdateResponse of(Integer postId) {
+        return PostUpdateResponse.builder()
+                .postId(postId)
+                .message("포스트 수정 완료")
+                .build();
+    }
 }
