@@ -53,6 +53,8 @@ class CommentApiControllerTest {
     private final PageRequest pageable = PageRequest.of(0, 10,Sort.Direction.DESC,"registeredAt");
     private final CommentDeleteResponse commentDeleteResponse = new CommentDeleteResponse(1, "댓글 삭제 완료");
 
+
+
     @Nested
     @DisplayName("조회")
     class CommentList {
@@ -267,7 +269,7 @@ class CommentApiControllerTest {
         @DisplayName("댓글 삭제 성공")
         public void comment_delete_success() throws Exception {
 
-            willDoNothing().given(commentService).delete(any(), any(), any());
+            given(commentService.delete(any(), any(), any())).willReturn(commentDeleteResponse);
 
             mockMvc.perform(delete("/api/v1/posts/" + postId + "/comments/" + commentDeleteResponse.getId())
                             .header(HttpHeaders.AUTHORIZATION,"Bearer " + token))

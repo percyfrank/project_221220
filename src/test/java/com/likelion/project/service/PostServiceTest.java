@@ -122,8 +122,8 @@ class PostServiceTest {
             given(postRepository.findById(post.getId())).willThrow(new AppException(ErrorCode.POST_NOT_FOUND));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> postService.update(post.getId(), user.getUserName(), PostUpdateRequest.builder()
-                            .title(post.getTitle()).body(post.getBody()).build()));
+                    () -> postService.update(post.getId(),PostUpdateRequest.builder()
+                            .title(post.getTitle()).body(post.getBody()).build(), user.getUserName()));
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.POST_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("해당 포스트가 없습니다.");
         }
@@ -139,8 +139,8 @@ class PostServiceTest {
 //            given(postRepository.findById(post.getId())).willReturn(Optional.of(post)); // @MockitoSettings(strictness = Strictness.LENIENT)가 있어야 함
 
             AppException appException = assertThrows(AppException.class,
-                    () -> postService.update(post.getId(), user.getUserName(),
-                            PostUpdateRequest.builder().title(post.getTitle()).body(post.getBody()).build()));
+                    () -> postService.update(post.getId(),PostUpdateRequest.builder()
+                            .title(post.getTitle()).body(post.getBody()).build(), user.getUserName()));
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.INVALID_PERMISSION);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("사용자가 권한이 없습니다.");
 
@@ -154,8 +154,8 @@ class PostServiceTest {
             given(userRepository.findByUserName(user.getUserName())).willThrow(new AppException(ErrorCode.USERNAME_NOT_FOUND));
 
             AppException appException = assertThrows(AppException.class,
-                    () -> postService.update(post.getId(), user.getUserName(),
-                            PostUpdateRequest.builder().title(post.getTitle()).body(post.getBody()).build()));
+                    () -> postService.update(post.getId(),PostUpdateRequest.builder()
+                            .title(post.getTitle()).body(post.getBody()).build(), user.getUserName()));
             assertThat(appException.getErrorCode()).isEqualTo(ErrorCode.USERNAME_NOT_FOUND);
             assertThat(appException.getErrorCode().getMessage()).isEqualTo("Not founded");
         }

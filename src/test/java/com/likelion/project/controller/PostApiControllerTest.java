@@ -69,6 +69,9 @@ class PostApiControllerTest {
     private final PageRequest pageable = PageRequest.of(0, 20,Sort.Direction.DESC,"registeredAt");
     private PostUpdateRequest postUpdateRequest;
     private PostDeleteRequest postDeleteRequest;
+
+    private final PostDeleteResponse postDeleteResponse = new PostDeleteResponse(1, "포스트 삭제 완료");
+    private final PostUpdateResponse postUpdateResponse = new PostUpdateResponse(1, "포스트 수정 완료");
     private final PostDetailResponse postDetailResponse = PostDetailResponse.builder().id(1).title("title").body("body").userName("userName").build();
 
     @Nested
@@ -314,7 +317,7 @@ class PostApiControllerTest {
         @DisplayName("포스트 수정 성공")
         public void post_update_success() throws Exception {
 
-            willDoNothing().given(postService).update(any(),any(),any());
+            given(postService.update(any(), any(), any())).willReturn(postUpdateResponse);
 
             mockMvc.perform(put("/api/v1/posts/1")
                             .header(HttpHeaders.AUTHORIZATION,"Bearer " + token)
@@ -418,7 +421,7 @@ class PostApiControllerTest {
         @DisplayName("포스트 삭제 성공")
         public void post_delete_success() throws Exception {
 
-            doNothing().when(postService).delete(any(), any());
+            given(postService.delete(any(), any())).willReturn(postDeleteResponse);
 
             mockMvc.perform(delete("/api/v1/posts/" + postDeleteRequest.getId())
                             .header(HttpHeaders.AUTHORIZATION,"Bearer " + token)
