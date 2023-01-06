@@ -81,9 +81,7 @@ class PostApiControllerTest {
             Integer postsId = 1;
             given(postService.findPost(postsId)).willReturn(postDetailResponse);
 
-            mockMvc.perform(get("/api/v1/posts/" + postsId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsBytes(postDetailResponse)))
+            mockMvc.perform(get("/api/v1/posts/" + postsId))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.result.id").value(1))
                     .andExpect(jsonPath("$.result.title").value("title"))
@@ -255,8 +253,7 @@ class PostApiControllerTest {
             willDoNothing().given(postService).createLike(any(), any());
 
             mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
-                            .header(HttpHeaders.AUTHORIZATION,"Bearer " + token)
-                            .contentType(MediaType.APPLICATION_JSON))
+                            .header(HttpHeaders.AUTHORIZATION,"Bearer " + token))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
                     .andExpect(jsonPath("$.result").value("좋아요를 눌렀습니다."))
@@ -271,8 +268,7 @@ class PostApiControllerTest {
 
             Integer postId = 1;
 
-            mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
-                            .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(post("/api/v1/posts/" + postId + "/likes"))
                     .andExpect(status().isUnauthorized())
                     .andExpect(jsonPath("$.resultCode").value("ERROR"))
                     .andExpect(jsonPath("$.result.errorCode").value("TOKEN_NOT_FOUND"))
@@ -292,8 +288,7 @@ class PostApiControllerTest {
             willThrow(new AppException(ErrorCode.POST_NOT_FOUND)).given(postService).createLike(any(), any());
 
             mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
-                            .header(HttpHeaders.AUTHORIZATION,"Bearer " + token)
-                            .contentType(MediaType.APPLICATION_JSON))
+                            .header(HttpHeaders.AUTHORIZATION,"Bearer " + token))
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.resultCode").value("ERROR"))
                     .andExpect(jsonPath("$.result.errorCode").value("POST_NOT_FOUND"))
