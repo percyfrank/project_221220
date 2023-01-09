@@ -47,8 +47,8 @@ dependencies {
 //}
 
 test {
-	useJUnitPlatform()
-	finalizedBy 'jacocoTestReport'
+	useJUnitPlatform()				// JUnit5를 사용하기 위한 설정
+	finalizedBy 'jacocoTestReport'  // Test 이후 커버리지가 동작하도록 finalizedBy 추가
 }
 
 jacoco {
@@ -62,8 +62,13 @@ jacocoTestReport {
 		html.enabled true
 		xml.enabled true
 		csv.enabled true
+
+		// html 파일 위치 지정
+		html.destination file('build/reports/myReport.html')
+
 	}
 
+	// 리포트 작성 시 특정 파일 제외
 	afterEvaluate {
 		classDirectories.setFrom(
 				files(classDirectories.files.collect {
@@ -71,8 +76,10 @@ jacocoTestReport {
 							'**/ProjectApplication*',
 							'**/*Request*',
 							'**/*Response*',
-							'**/*Dto*',
-							'**/Hello*'
+							'**/Hello*',
+							'**/Swagger*',
+							'**/PasswordEncoderConfig*',
+							'**/JpaAuditingConfig*'
 							// ...
 					])
 				})
@@ -83,6 +90,7 @@ jacocoTestReport {
 }
 
 // 내가 원하는 커버리지 기준을 만족하는지 확인해 주는 task
+// 점수 평가 및 검증 단계
 jacocoTestCoverageVerification {
 	violationRules {
 		rule {
@@ -114,8 +122,11 @@ jacocoTestCoverageVerification {
 					'**.*ProjectApplication*',
 					'**.*Request*',
 					'**.*Response*',
-					'**.*Dto*',
-					'**.*Hello*'
+					'**.*Hello*',
+					'**.*Swagger*',
+					'**.*PasswordEncoder*',
+					'**.*JpaAuditing*'
+
 			]
 		}
 	}
