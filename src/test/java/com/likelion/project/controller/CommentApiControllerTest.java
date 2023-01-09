@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTestSecurity(value = CommentApiController.class)
-@WebAppConfiguration
+//@WebAppConfiguration
 class CommentApiControllerTest {
 
     @Autowired
@@ -52,7 +52,6 @@ class CommentApiControllerTest {
     private final PageImpl<CommentResponse> page = new PageImpl<>(List.of(commentResponse,commentResponse2));
     private final PageRequest pageable = PageRequest.of(0, 10,Sort.Direction.DESC,"registeredAt");
     private final CommentDeleteResponse commentDeleteResponse = new CommentDeleteResponse(1, "댓글 삭제 완료");
-
 
 
     @Nested

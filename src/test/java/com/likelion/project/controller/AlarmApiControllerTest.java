@@ -8,8 +8,6 @@ import com.likelion.project.domain.entity.AlarmType;
 import com.likelion.project.jwt.JwtTokenUtil;
 import com.likelion.project.service.AlarmService;
 import com.likelion.project.service.CommentService;
-import com.likelion.project.service.PostService;
-import com.likelion.project.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,16 +18,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -50,6 +44,8 @@ class AlarmApiControllerTest {
     AlarmService alarmService;
     @MockBean
     CommentService commentService;
+    @MockBean
+    JwtTokenUtil jwtTokenUtil;
     @Value("${jwt.token.secret}") String secretKey;
     private final AlarmResponse alarmResponse =
             new AlarmResponse(1, AlarmType.NEW_COMMENT_ON_POST, 1, 1, "new comment!", LocalDateTime.now());
@@ -65,7 +61,7 @@ class AlarmApiControllerTest {
         @DisplayName("알람 목록 조회 성공")
         public void alarm_list_success() throws Exception {
 
-            String token = JwtTokenUtil.createToken("user", secretKey, 1000 * 60 * 60L);
+            String token = jwtTokenUtil.createToken("user", secretKey, 1000 * 60 * 60L);
 
             PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC,"registeredAt");
             PageImpl<AlarmResponse> alarmPage = new PageImpl<>(List.of(alarmResponse,alarmResponse2));

@@ -2,14 +2,8 @@ package com.likelion.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likelion.project.annotation.WebMvcTestSecurity;
-import com.likelion.project.annotation.WithMockCustomUser;
-import com.likelion.project.configuration.SecurityConfig;
-import com.likelion.project.domain.dto.comment.CommentResponse;
-import com.likelion.project.jwt.JwtTokenExceptionFilter;
-import com.likelion.project.jwt.JwtTokenFilter;
 import com.likelion.project.jwt.JwtTokenUtil;
 import com.likelion.project.domain.dto.post.*;
-import com.likelion.project.domain.entity.Post;
 import com.likelion.project.exception.ErrorCode;
 import com.likelion.project.exception.AppException;
 import com.likelion.project.service.PostService;
@@ -26,9 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTestSecurity(value = PostApiController.class)
-@WebAppConfiguration
+//@WebAppConfiguration
 //@ContextConfiguration(classes = SecurityConfig.class)
 class PostApiControllerTest {
 
@@ -56,8 +48,6 @@ class PostApiControllerTest {
     PostService postService;
     @MockBean
     UserService userService;
-    @Autowired
-    WebApplicationContext context;
     @Value("${jwt.token.secret}") String secretKey;
 
     private final PostCreateRequest postCreateRequest = new PostCreateRequest("제목", "내용");
@@ -69,7 +59,6 @@ class PostApiControllerTest {
     private final PageRequest pageable = PageRequest.of(0, 20,Sort.Direction.DESC,"registeredAt");
     private PostUpdateRequest postUpdateRequest;
     private PostDeleteRequest postDeleteRequest;
-
     private final PostDeleteResponse postDeleteResponse = new PostDeleteResponse(1, "포스트 삭제 완료");
     private final PostUpdateResponse postUpdateResponse = new PostUpdateResponse(1, "포스트 수정 완료");
     private final PostDetailResponse postDetailResponse = PostDetailResponse.builder().id(1).title("title").body("body").userName("userName").build();
@@ -156,6 +145,39 @@ class PostApiControllerTest {
                     .andDo(print());
 
             then(postService).should(never()).findMyPost(any(),any());
+        }
+
+        @Test
+        @DisplayName("좋아요 갯수 조회 성공")
+        public void getCountLike_success() throws Exception {
+
+            Integer postId = 1;
+            given(postService.getCountLike(postId)).willReturn(anyLong());
+
+            mockMvc.perform(get("/api/v1/posts/" + postId + "/likes"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                    .andExpect(jsonPath("$.result").value(0))
+                    .andDo(print());
+
+            then(postService).should(times(1)).getCountLike(postId);
+        }
+
+        @Test
+        @DisplayName("좋아요 갯수 조회 실패 - 포스트 없음")
+        public void getCountLike_fail1() throws Exception {
+
+            Integer postId = 1;
+            given(postService.getCountLike(postId)).willThrow(new AppException(ErrorCode.POST_NOT_FOUND));
+
+            mockMvc.perform(get("/api/v1/posts/" + postId + "/likes"))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result.errorCode").value("POST_NOT_FOUND"))
+                    .andExpect(jsonPath("$.result.message").value("해당 포스트가 없습니다."))
+                    .andDo(print());
+
+            then(postService).should(times(1)).getCountLike(postId);
         }
     }
 
@@ -253,7 +275,7 @@ class PostApiControllerTest {
             Integer postId = 1;
             String token = JwtTokenUtil.createToken("userName", secretKey, 1000 * 60 * 60L);
 
-            willDoNothing().given(postService).createLike(any(), any());
+            given(postService.createLike(any(), any())).willReturn("좋아요를 눌렀습니다.");
 
             mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
                             .header(HttpHeaders.AUTHORIZATION,"Bearer " + token))
@@ -288,7 +310,7 @@ class PostApiControllerTest {
             Integer postId = 1;
             String token = JwtTokenUtil.createToken("userName", secretKey, 1000 * 60 * 60L);
 
-            willThrow(new AppException(ErrorCode.POST_NOT_FOUND)).given(postService).createLike(any(), any());
+            given(postService.createLike(any(), any())).willThrow(new AppException(ErrorCode.POST_NOT_FOUND));
 
             mockMvc.perform(post("/api/v1/posts/" + postId + "/likes")
                             .header(HttpHeaders.AUTHORIZATION,"Bearer " + token))
