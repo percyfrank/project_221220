@@ -4,7 +4,6 @@ import com.likelion.project.domain.dto.post.*;
 import com.likelion.project.domain.entity.*;
 import com.likelion.project.exception.ErrorCode;
 import com.likelion.project.exception.AppException;
-import com.likelion.project.exception.AppException;
 import com.likelion.project.repository.AlarmRepository;
 import com.likelion.project.repository.LikeRepository;
 import com.likelion.project.repository.PostRepository;
@@ -14,9 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.validation.Valid;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -93,7 +89,7 @@ public class PostService {
         return posts.map(PostResponse::of);
     }
 
-    public void createLike(Integer postId, String userName) {
+    public String createLike(Integer postId, String userName) {
         // 로그인 유저 확인
         User user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
@@ -109,12 +105,14 @@ public class PostService {
                 });
 
         // 좋아요 저장
-        likeRepository.save(Like.createLike(post,user));
+        likeRepository.save(Like.createLike(post, user));
 
         // 좋아요 저장되면 알람도 저장
         if(!post.getUser().getUserName().equals(userName)) {
             alarmRepository.save(Alarm.createAlarm(user, post, AlarmType.NEW_LIKE_ON_POST));
         }
+
+        return "좋아요를 눌렀습니다.";
     }
 
     @Transactional(readOnly = true)

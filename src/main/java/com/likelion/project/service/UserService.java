@@ -52,16 +52,16 @@ public class UserService {
         return new UserLoginResponse(JwtTokenUtil.createToken(userName, secretKey, expireTimeMs));
     }
 
-    public UserRoleResponse changeRole(Integer id, UserRoleRequest userRoleRequest, String userName) {
+    public UserRoleResponse changeRole(Integer id, UserRoleRequest userRoleRequest, String adminUserName) {
 
         // 권한을 변경하고자 하는(@PathVariable의) 사용자가 있는지 확인
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
 
         // 해당 요청을 수행하려는 사용자가 로그인된 사용자인지 확인
-        User loginUser = userRepository.findByUserName(userName).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
+        User adminUser = userRepository.findByUserName(adminUserName).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
 
         // 로그인된 사용자의 권한이 관리자 권한인지 확인
-        if (!loginUser.getRole().equals("ROLE_ADMIN")) {
+        if (!adminUser.getRole().equals("ROLE_ADMIN")) {
             throw new AppException(ErrorCode.INVALID_PERMISSION);
         }
 

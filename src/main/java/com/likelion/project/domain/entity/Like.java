@@ -34,11 +34,6 @@ public class Like extends BaseEntity {
 //    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    public Like(Post post, User user) {
-        this.post = post;
-        this.user = user;
-    }
-
     public static Like createLike(Post post, User user) {
         return Like.builder().post(post).user(user).build();
     }
