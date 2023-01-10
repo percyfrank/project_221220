@@ -18,6 +18,15 @@ spring:
     database : mysql
     hibernate.ddl-auto : update
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    tagsSorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+
 jwt:
   token:
     secret: hello
