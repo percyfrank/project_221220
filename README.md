@@ -1,6 +1,59 @@
 # MutsaSNS
 **멋쟁이사자처럼 백엔드스쿨 2기 학생들의 학습 내용 정리를 위한 게시판**
 
+## 특이사항
+
+### 1. Jacoco 코드 커버리지 적용
+
+제일 공들인 부분이라고 할 수 있다.
+
+테스트 코드를 작성하면서 내가 지금 작성하고 있는 테스트 코드가 실제 코드를 정확히 테스트 하고 있는지에 대한 의문이 들었다.
+
+`Jacoco`라는 코드 커버리지 라이브러리를 통해, 내가 작성한 테스트 코드가 실제 코드를 얼마나 테스트 하는지를 확인할 수 있었다.
+
+뿐만 아니라, Jacoco 리포트를 통해, 내가 분명히 테스트했다고 생각했던 부분들이 잘 진행되지 않는 상황을 맞닥뜨리면 내가 작성한 코드가
+테스트 하기 어려운 코드일 수 도 있겠다는 생각을 했다.
+
+그러면서 자연스럽게 코드 리팩토링 과정에 대한 생각을 할 수 있었고, 선순환 과정의 시작이었다고 생각한다.
+
+분명 테스트 코드를 작성하는 것은 꽤나 고통스러운 작업이지만, 코드 커버리지 도구들을 활용하면 정확하게 테스트를 진행할 수 있으며, 이 과정은
+다시 코드 리팩토링을 불러 일으킨다는 점에서 많은 것을 배울 수 있었다.
+
+#### References
+
+* [Gradle 프로젝트 Jacoco 적용하기](https://percyfrank.github.io/springboot/jacoco01/)
+
+---
+
+### 2. Jwt 토큰 Exception Handling
+
+Security Filter는 스프링 영역 이전에 존재하기 때문에 @RestControllerAdvice로는 Security Filter에 대한 에러 처리를 할 수 없다.
+
+기존의 Security Filter를 커스텀 한 `CustomAuthenticationEntryPoint`, `JwtTokenExceptionFilter`등을 통해 처리할 수 있었다.
+
+추가적으로, 관리자 권한과 관련한 에러 처리는 아직 진행하지 못했지만, 비슷한 방법으로 진행할 예정이다.
+
+#### References
+
+* [JWT 토큰 예외처리(1) - 부적절한 토큰에 대한 예외처리](https://percyfrank.github.io/springboot/jwt/)
+* [JWT 토큰 예외처리(2) - 토큰이 없는 경우](https://percyfrank.github.io/springboot/jwt02/)
+
+---
+
+### 3. Controller Test에 Security 포함하기
+
+Controller 테스트를 진행하면서 Security가 포함되는 영역의 범위를 결정해야 했다.
+
+아예 제외하거나, 부분적으로 포함하거나, 완전히 포함시키는 등의 3가지 방법이 있었고, 결과적으로는 포함시켜서 테스트틀 진행했다.
+
+정확히 작동하는 테스트를 만들기 위해 많은 노력을 기울였고, 해당 방법을 찾기 위해 여러 사람들의 도움을 받았다.
+
+최종적으로는, 직접 만든 `WebSecurityConfig`을 포함시키는 커스텀 `WebMvcTest` 어노테이션을 만들어서 진행했다.
+
+#### References
+
+* [Controller Test시 Security 포함 방법](https://percyfrank.github.io/springboot/Test03/)
+
 ## 요구사항
 - [ ] Swagger
 - [ ] AWS EC2에 Docker 배포
@@ -38,11 +91,8 @@
 - DB : MySql 8.0
 - Library : SpringBoot Web, MySQL, Spring Data JPA, Lombok, Spring Security, Swagger
 
-## URL
-> http://ec2-3-34-28-158.ap-northeast-2.compute.amazonaws.com:8080
-
 ## Swagger
-> http://ec2-3-34-28-158.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/
+> http://ec2-3-34-28-158.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/index.html
 
 ## ERD
 ![](erd.png)
@@ -183,58 +233,7 @@ INVALID_VALUE(HttpStatus.BAD_REQUEST, "요청이 이상합니다.");
 | GET    | /api/v1/alarms                              | 특정 유저의 알람 리스트 조회    | 
 
 
-## 특이사항
 
-### 1. Jacoco 코드 커버리지 적용
-
-제일 공들인 부분이라고 할 수 있다.
-
-테스트 코드를 작성하면서 내가 지금 작성하고 있는 테스트 코드가 실제 코드를 정확히 테스트 하고 있는지에 대한 의문이 들었다.
-
-`Jacoco`라는 코드 커버리지 라이브러리를 통해, 내가 작성한 테스트 코드가 실제 코드를 얼마나 테스트 하는지를 확인할 수 있었다.
-
-뿐만 아니라, Jacoco 리포트를 통해, 내가 분명히 테스트했다고 생각했던 부분들이 잘 진행되지 않는 상황을 맞닥뜨리면 내가 작성한 코드가
-테스트 하기 어려운 코드일 수 도 있겠다는 생각을 했다.
-
-그러면서 자연스럽게 코드 리팩토링 과정에 대한 생각을 할 수 있었고, 선순환 과정의 시작이었다고 생각한다.
-
-분명 테스트 코드를 작성하는 것은 꽤나 고통스러운 작업이지만, 코드 커버리지 도구들을 활용하면 정확하게 테스트를 진행할 수 있으며, 이 과정은
-다시 코드 리팩토링을 불러 일으킨다는 점에서 많은 것을 배울 수 있었다.
-
-#### References
-
-* [Gradle 프로젝트 Jacoco 적용하기](https://percyfrank.github.io/springboot/jacoco01/)
-
----
-
-### 2. Jwt 토큰 Exception Handling
-
-Security Filter는 스프링 영역 이전에 존재하기 때문에 @RestControllerAdvice로는 Security Filter에 대한 에러 처리를 할 수 없다.
-
-기존의 Security Filter를 커스텀 한 `CustomAuthenticationEntryPoint`, `JwtTokenExceptionFilter`등을 통해 처리할 수 있었다.
-
-추가적으로, 관리자 권한과 관련한 에러 처리는 아직 진행하지 못했지만, 비슷한 방법으로 진행할 예정이다.
-
-#### References
-
-* [JWT 토큰 예외처리(1) - 부적절한 토큰에 대한 예외처리](https://percyfrank.github.io/springboot/jwt/)
-* [JWT 토큰 예외처리(2) - 토큰이 없는 경우](https://percyfrank.github.io/springboot/jwt02/)
-
----
-
-### 3. Controller Test에 Security 포함하기
-
-Controller 테스트를 진행하면서 Security가 포함되는 영역의 범위를 결정해야 했다.
-
-아예 제외하거나, 부분적으로 포함하거나, 완전히 포함시키는 등의 3가지 방법이 있었고, 결과적으로는 포함시켜서 테스트틀 진행했다.
-
-정확히 작동하는 테스트를 만들기 위해 많은 노력을 기울였고, 해당 방법을 찾기 위해 여러 사람들의 도움을 받았다.
-
-최종적으로는, 직접 만든 `WebSecurityConfig`을 포함시키는 커스텀 `WebMvcTest` 어노테이션을 만들어서 진행했다.
-
-#### References
-
-* [Controller Test시 Security 포함 방법](https://percyfrank.github.io/springboot/Test03/)
 
 
 
