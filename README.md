@@ -119,7 +119,7 @@ INVALID_VALUE(HttpStatus.BAD_REQUEST, "요청이 이상합니다.");
 
 #### Jacoco 커버리지
 
-![img_2.png](img_2.png)
+![img_1.png](img_1.png)!
 
 | Controller Test          |                        |                                 |
 |--------------------------|------------------------|---------------------------------|
