@@ -1,11 +1,9 @@
 package com.likelion.project.jwt;
 
-import com.likelion.project.domain.dto.user.UserLoginResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class JwtTokenUtil {

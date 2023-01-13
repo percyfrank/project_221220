@@ -52,13 +52,13 @@ public class UserService {
         return new UserLoginResponse(JwtTokenUtil.createToken(userName, secretKey, expireTimeMs));
     }
 
-    public UserRoleResponse changeRole(Integer id, UserRoleRequest userRoleRequest, String adminUserName) {
-
-        // 권한을 변경하고자 하는(@PathVariable의) 사용자가 있는지 확인
-        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
+    public UserRoleChangeResponse changeRole(Integer id, UserRoleChangeRequest userRoleChangeRequest, String adminUserName) {
 
         // 해당 요청을 수행하려는 사용자가 로그인된 사용자인지 확인
         User adminUser = userRepository.findByUserName(adminUserName).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
+
+        // 권한 변경될 (@PathVariable의) 사용자가 있는지 확인
+        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND));
 
         // 로그인된 사용자의 권한이 관리자 권한인지 확인
         if (!adminUser.getRole().equals("ROLE_ADMIN")) {
@@ -66,14 +66,14 @@ public class UserService {
         }
 
         // 권한 변경이 되기를 바라는 요청의 권한 추출
-        String requestedRole = userRoleRequest.getRole();
+        String requestedRole = userRoleChangeRequest.getRole();
 
         // 현재 유저의 권한과 다른 권한으로 변경하고자 할때만 변경
         if (!user.getRole().equals(requestedRole)) {
             user.changeRole(requestedRole);
         }
 
-        return new UserRoleResponse(id, requestedRole + " 권한으로 변경되었습니다.");
+        return new UserRoleChangeResponse(id, requestedRole + " 권한으로 변경되었습니다.");
 
     }
 }

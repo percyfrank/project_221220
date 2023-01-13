@@ -1,7 +1,9 @@
 package com.likelion.project.service;
 
 import com.likelion.project.domain.dto.alarm.AlarmResponse;
-import com.likelion.project.domain.entity.*;
+import com.likelion.project.domain.entity.Alarm;
+import com.likelion.project.domain.entity.AlarmType;
+import com.likelion.project.domain.entity.User;
 import com.likelion.project.exception.AppException;
 import com.likelion.project.exception.ErrorCode;
 import com.likelion.project.repository.AlarmRepository;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;

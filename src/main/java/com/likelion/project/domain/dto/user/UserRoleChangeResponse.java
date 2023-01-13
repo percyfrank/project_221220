@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRoleResponse {
+public class UserRoleChangeResponse {
     private Integer userId;
     private String message;
 }

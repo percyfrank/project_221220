@@ -1,17 +1,16 @@
 package com.likelion.project.service;
 
-import com.likelion.project.domain.dto.alarm.AlarmResponse;
 import com.likelion.project.domain.dto.comment.CommentDeleteResponse;
 import com.likelion.project.domain.dto.comment.CommentRequest;
 import com.likelion.project.domain.dto.comment.CommentResponse;
-import com.likelion.project.domain.entity.*;
+import com.likelion.project.domain.entity.Comment;
+import com.likelion.project.domain.entity.Post;
+import com.likelion.project.domain.entity.User;
 import com.likelion.project.exception.AppException;
 import com.likelion.project.exception.ErrorCode;
-import com.likelion.project.repository.AlarmRepository;
 import com.likelion.project.repository.CommentRepository;
 import com.likelion.project.repository.PostRepository;
 import com.likelion.project.repository.UserRepository;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,8 +27,8 @@ import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -45,8 +44,6 @@ class CommentServiceTest {
     private UserRepository userRepository;
     @Mock
     private PostRepository postRepository;
-    @Mock
-    private AlarmRepository alarmRepository;
     @InjectMocks
     private CommentService commentService;
     private User user;
@@ -88,7 +85,6 @@ class CommentServiceTest {
 
             then(commentRepository).should(times(1)).findByPostId(post.getId(), pageable);
         }
-
     }
 
     @Nested

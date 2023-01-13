@@ -2,10 +2,10 @@ package com.likelion.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likelion.project.annotation.WebMvcTestSecurity;
-import com.likelion.project.jwt.JwtTokenUtil;
 import com.likelion.project.domain.dto.post.*;
-import com.likelion.project.exception.ErrorCode;
 import com.likelion.project.exception.AppException;
+import com.likelion.project.exception.ErrorCode;
+import com.likelion.project.jwt.JwtTokenUtil;
 import com.likelion.project.service.PostService;
 import com.likelion.project.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,10 +26,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.likelion.project.exception.ErrorCode.INVALID_TOKEN;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

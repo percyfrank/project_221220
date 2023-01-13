@@ -1,9 +1,7 @@
 package com.likelion.project.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.likelion.project.annotation.WebMvcTestSecurity;
 import com.likelion.project.domain.dto.alarm.AlarmResponse;
-import com.likelion.project.domain.dto.comment.CommentResponse;
 import com.likelion.project.domain.entity.AlarmType;
 import com.likelion.project.jwt.JwtTokenUtil;
 import com.likelion.project.service.AlarmService;
