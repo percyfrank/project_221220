@@ -89,9 +89,6 @@ Controller 테스트를 진행하면서 Security가 포함되는 영역의 범�
 - DB : MySql 8.0
 - Library : SpringBoot Web, MySQL, Spring Data JPA, Lombok, Spring Security, Swagger
 
-## Swagger
-> http://ec2-3-34-28-158.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/index.html
-
 ## ERD
 ![](erd.png)
 
