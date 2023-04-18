@@ -25,7 +25,7 @@
 
 ### 2. Jwt 토큰 Exception Handling
 
-Security Filter는 스프링 영역 이전에 존재하기 때문에 @RestControllerAdvice로는 Security Filter에 대한 에러 처리를 할 수 없다.
+Security Filter는 스프링 영역 이전에 존재하기 때문에 `@RestControllerAdvice`로는 Security Filter에 대한 에러 처리를 할 수 없다.
 
 기존의 Security Filter를 커스텀 한 `CustomAuthenticationEntryPoint`, `JwtTokenExceptionFilter`등을 통해 처리할 수 있었다.
 
